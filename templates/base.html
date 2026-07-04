@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>{%block  title%} base template{% endblock%}</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        {%block style%} {%endblock%}       
+    </head>
+    <body> 
+        <div class ="nav-bar" id ="nav-bar">
+            <div class="nav-section">
+                <button class="menu" id="menu"> Menu</button>
+                <nav class="nav" id ="nav">
+                    <button class="back" id="back">&times;</button>
+                    <li><a  class="nav-item" href="/home">Home</a></li>
+                    <li><a class="nav-item" href="/signup">Sign up</a></li>
+                    <li><a class="nav-item" href="/login"> Login</a></li>
+                    <li><a class="nav-item" href="/about"> About</a></li>
+                    
+                </nav>
+            </div>
+        </div>
+ <style type="text/css">
+     body{
+    text-align:center;
+    color: black;
+    font-family: Sans-serif;
+    font-size:14px;
+}
+.nav-bar{
+    width:100%;
+    height:auto;
+    transition: 0.3s height ease;
+    background: black;
+    opticity:0.6;
+    gap:1rem;
+    text-align:left;
+    align-items:flex-start;
+    padding:10px;
+
+}
+.nav-section{
+    list-style:none;
+    width:100%;
+    height:auto;
+    aling-items:center;
+    display:block;
+}
+.menu{
+    margin:16px;
+    background:transparent;
+    border:1px solid ;
+    outline:none;
+    width:80px;
+    height:40px;
+    color:white;
+    border-radius:10px;
+    font-size:20px;
+    transition: 0.3s transform ease;
+}
+.back{
+    background:transparent;
+    border:0px;
+    outline:none;
+    width:80px;
+    height:40px;
+    color:white;
+    text-align:left;
+    border-radius:10px;
+    font-size:2rem;
+    transition: 0.2s transform ease;
+}
+.menu:hover,.back:hover{
+    color:gray;
+    border:0px;
+    outline:none;
+    transform: translate(8px,2px);
+}
+.nav{
+    right:40px;
+    display: none;
+}
+.nav a{
+    text-decoration: none;
+    color:white;
+    font-size:1.2rem;
+    font-weight:500px;
+    transition: 0.3s transform ease;
+}
+nav a:hover{
+    color: gray;
+    font-size:1.2rem;
+    transform: translate(10px,2px);
+}
+
+ </style>       
+        {% block content %}{% endblock %}
+        <script>
+            const menu = document.getElementById("menu");
+            const back = document.getElementById("back");
+            const nav = document.getElementById("nav");
+            const navBar = document.getElementById("nav-bar");
+            menu.addEventListener("click",()=>{
+                nav.style.display="block";
+                navBar.style.height="auto";
+                menu.style.display="none";
+            });
+            back.addEventListener("click",()=>{
+                nav.style.display="none";
+                navBar.style.height="auto";
+                menu.style.display="block";
+            });
+        </script>
+    </body>
+
+</html>

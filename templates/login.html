@@ -1,0 +1,33 @@
+{% extends "base.html"%}
+{%block title%} login page {%endblock %}
+{%block style%}
+    <link rel="stylesheet"
+ 	href="{{ url_for('static',filename='login.css') }}">
+ {%endblock %}
+{%block content%} 
+
+<h1>Login </h1>
+<form action ="/login" name="loginform" id ="loginform" method ="POST">
+	<div class="input">
+<label for ="email">Email address</label>
+<input name ="email" type="email" id ="email" required/>
+</div>
+<div class="input">
+<label for ="password">Password</label>
+<input name ="password" type="password" id ="password" required/>
+</div>
+<div class="input">
+    <input type = "submit" id ="submit" value ="Creat account"/>
+</div>
+<div class="forgot">
+<p><a>Forgot password?</a></p>
+</div>
+<div class="signup">
+<p>Do not have account?</p>
+<a href ="signup.html">Sign up<a>
+</div>
+</form>
+<script type ="text/javascript" 
+	src ="{{url_for('static',filename ='login.js')}}">
+</script>
+{%endblock%}
