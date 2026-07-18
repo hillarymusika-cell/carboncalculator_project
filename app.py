@@ -1,6 +1,9 @@
-from flask import Flask, requests,render_template
+import os
+from init import create_app
 
+app = create_app()
 
-@app.route(/home)
-def home():
-    pass
+if __name__ == "__main__":
+    debug_mode = os.environ.get("FLASK_DEBUG", "0") == "1"
+    port = int(os.environ.get("PORT", 5000))
+    app.run(debug=debug_mode, port=port)

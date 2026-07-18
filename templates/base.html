@@ -1,119 +1,294 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block title %}base template{% endblock %}</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='nav.css') }}" type="text/css" media="all" />
+    {% block style %}{% endblock %}
 
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>{%block  title%} base template{% endblock%}</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        {%block style%} {%endblock%}       
-    </head>
-    <body> 
-        <div class ="nav-bar" id ="nav-bar">
-            <div class="nav-section">
-                <button class="menu" id="menu"> Menu</button>
-                <nav class="nav" id ="nav">
-                    <button class="back" id="back">&times;</button>
-                    <li><a  class="nav-item" href="/home">Home</a></li>
-                    <li><a class="nav-item" href="/signup">Sign up</a></li>
-                    <li><a class="nav-item" href="/login"> Login</a></li>
-                    <li><a class="nav-item" href="/about"> About</a></li>
-                    
-                </nav>
-            </div>
+    <style>
+        :root{
+            --teal-deep: #003C3D;
+            --teal-base: #004E4F;
+            --teal-light: #007E69;
+            --cyan-accent: #00C7D2;
+            --cyan-glow: #00D0C6;
+            --ink: #0A1F1F;
+            --paper: #F7FAF9;
+            --muted: #9FB8B6;
+        }
+
+        *{
+            box-sizing: border-box;
+        }
+
+        body{
+            margin: 0;
+            text-align: center;
+            color: var(--ink);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            background: var(--paper);
+        }
+
+        li{
+            margin: 4px 0;
+            list-style: none;
+        }
+
+        /* ---------- Nav bar ---------- */
+
+        .nav-bar{
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 64px;
+            overflow: hidden;
+            background: linear-gradient(160deg, var(--teal-deep), var(--teal-base));
+            padding: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+            transition: height 0.35s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        .nav-bar.open{
+            height: 100vh;
+        }
+
+        .nav-section{
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .menu{
+            margin: 12px;
+            background: transparent;
+            border: 0;
+            outline: none;
+            width: 44px;
+            height: 44px;
+            color: white;
+            border-radius: 10px;
+            font-size: 1.6rem;
+            cursor: pointer;
+            align-self: flex-start;
+            flex-shrink: 0;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .menu:hover{
+            background: rgba(255,255,255,0.08);
+            transform: scale(1.05);
+        }
+
+        .menu:focus-visible,
+        .back:focus-visible,
+        .nav a:focus-visible{
+            outline: 2px solid var(--cyan-accent);
+            outline-offset: 2px;
+        }
+
+        .nav{
+            margin: 0;
+            padding: 0 24px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            opacity: 0;
+            transform: translateY(-8px);
+            transition: opacity 0.3s ease 0.1s, transform 0.3s ease 0.1s;
+            overflow-y: auto;
+        }
+
+        .nav-bar.open .nav{
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .profile{
+            border-radius: 50%;
+            height: 44px;
+            width: 44px;
+            border: solid var(--cyan-accent) 2px;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            margin: 8px 0 20px;
+        }
+
+        .profile_logo{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: solid var(--teal-light) 1px;
+            border-radius: 50%;
+            height: 100%;
+            width: 100%;
+            box-shadow: 0 0 10px var(--cyan-glow);
+        }
+
+        .nav a{
+            text-decoration: none;
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 500;
+            padding: 6px 10px;
+            border-radius: 8px;
+            width: 100%;
+            text-align: left;
+            transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+        }
+
+        .nav a:hover,
+        .nav a.active{
+            color: var(--cyan-accent);
+            background: rgba(255,255,255,0.06);
+            transform: translateX(6px);
+        }
+
+        .nav a.active{
+            border-left: 3px solid var(--cyan-accent);
+        }
+
+        .back{
+            background: transparent;
+            border: 0;
+            outline: none;
+            width: 100%;
+            text-align: left;
+            color: white;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            padding: 8px 10px;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+        }
+
+        .back:hover{
+            color: var(--cyan-accent);
+            background: rgba(255,255,255,0.06);
+            transform: translateX(6px);
+        }
+
+        #exit{
+            margin-top: auto;
+            color: #ff8a8a;
+        }
+
+        #exit:hover{
+            color: #ffb3b3;
+        }
+
+        /* push page content below the fixed bar */
+        .page-content{
+            padding-top: 80px;
+        }
+    </style>
+</head>
+<body id="body">
+
+    <div class="nav-bar" id="nav-bar">
+        <div class="nav-section">
+            <button class="menu" id="menu" aria-label="Open menu" aria-expanded="false">&#9776;</button>
+
+            <nav class="nav" id="nav" aria-hidden="true">
+                <div class="profile">
+                    <div class="profile_logo">
+                        <h3 id="not-available" style="margin:0;font-size:14px;">N/A</h3>
+                    </div>
+                </div>
+                {%if user.is_authenticated%}
+                <li><a class="nav-item" href="{{ url_for('views.home') }}">Home</a></li>
+                <li><a href="{{ url_for('views.about') }}">About</a></li>
+                <li><button class="back" id="recent" type="button">Recent</button></li>
+                <li><button class="back" id="back" type="button">&larr; Back</button></li>
+                <li><button class="back" id="exit" type="button">&times; Exit</button></li>
+                {%else%}
+                <li><a href="{{ url_for('auth.signup') }}">Sign up</a></li>
+                <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+                {%endif%}
+            </nav>
         </div>
- <style type="text/css">
-     body{
-    text-align:center;
-    color: black;
-    font-family: Sans-serif;
-    font-size:14px;
-}
-.nav-bar{
-    width:100%;
-    height:auto;
-    transition: 0.3s height ease;
-    background: black;
-    opticity:0.6;
-    gap:1rem;
-    text-align:left;
-    align-items:flex-start;
-    padding:10px;
+    </div>
 
-}
-.nav-section{
-    list-style:none;
-    width:100%;
-    height:auto;
-    aling-items:center;
-    display:block;
-}
-.menu{
-    margin:16px;
-    background:transparent;
-    border:1px solid ;
-    outline:none;
-    width:80px;
-    height:40px;
-    color:white;
-    border-radius:10px;
-    font-size:20px;
-    transition: 0.3s transform ease;
-}
-.back{
-    background:transparent;
-    border:0px;
-    outline:none;
-    width:80px;
-    height:40px;
-    color:white;
-    text-align:left;
-    border-radius:10px;
-    font-size:2rem;
-    transition: 0.2s transform ease;
-}
-.menu:hover,.back:hover{
-    color:gray;
-    border:0px;
-    outline:none;
-    transform: translate(8px,2px);
-}
-.nav{
-    right:40px;
-    display: none;
-}
-.nav a{
-    text-decoration: none;
-    color:white;
-    font-size:1.2rem;
-    font-weight:500px;
-    transition: 0.3s transform ease;
-}
-nav a:hover{
-    color: gray;
-    font-size:1.2rem;
-    transform: translate(10px,2px);
-}
-
- </style>       
+    {% block script %}{% endblock %}
+    <div class="page-content">
         {% block content %}{% endblock %}
-        <script>
-            const menu = document.getElementById("menu");
-            const back = document.getElementById("back");
-            const nav = document.getElementById("nav");
-            const navBar = document.getElementById("nav-bar");
-            menu.addEventListener("click",()=>{
-                nav.style.display="block";
-                navBar.style.height="auto";
-                menu.style.display="none";
-            });
-            back.addEventListener("click",()=>{
-                nav.style.display="none";
-                navBar.style.height="auto";
-                menu.style.display="block";
-            });
-        </script>
-    </body>
+    </div>
 
+    <script src="{{ url_for('static', filename='nav.js') }}" type="text/javascript" charset="utf-8"></script>
+    <script>
+        (function () {
+            const menu   = document.getElementById("menu");
+            const back   = document.getElementById("back");
+            const exit   = document.getElementById("exit");
+            const recent = document.getElementById("recent");
+            const nav    = document.getElementById("nav");
+            const navBar = document.getElementById("nav-bar");
+            const links  = nav.querySelectorAll("a");
+
+            function openMenu() {
+                navBar.classList.add("open");
+                nav.setAttribute("aria-hidden", "false");
+                menu.setAttribute("aria-expanded", "true");
+                menu.innerHTML = "&times;";
+            }
+
+            function closeMenu() {
+                navBar.classList.remove("open");
+                nav.setAttribute("aria-hidden", "true");
+                menu.setAttribute("aria-expanded", "false");
+                menu.innerHTML = "&#9776;";
+            }
+
+            function toggleMenu() {
+                navBar.classList.contains("open") ? closeMenu() : openMenu();
+            }
+
+            menu.addEventListener("click", toggleMenu);
+            back.addEventListener("click", closeMenu);
+            exit.addEventListener("click", closeMenu);
+
+            // Close the menu with Escape for keyboard users
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "Escape" && navBar.classList.contains("open")) {
+                    closeMenu();
+                }
+            });
+
+            // Highlight the current page's nav link
+            const currentPath = window.location.pathname;
+            links.forEach((link) => {
+                if (link.getAttribute("href") === currentPath) {
+                    link.classList.add("active");
+                }
+                // Close the menu once a link is actually followed
+                link.addEventListener("click", closeMenu);
+            });
+
+            // "Recent" remembers and jumps back to the last visited page
+            recent.addEventListener("click", () => {
+                const last = sessionStorage.getItem("lastPage");
+                if (last) {
+                    window.location.href = last;
+                } else {
+                    closeMenu();
+                }
+            });
+
+            window.addEventListener("beforeunload", () => {
+                sessionStorage.setItem("lastPage", window.location.href);
+            });
+        })();
+    </script>
+</body>
 </html>

@@ -1,0 +1,68 @@
+import os
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
+from flask_wtf import CSRFProtect
+from dotenv import load_dotenv
+
+load_dotenv()
+
+db = SQLAlchemy()
+csrf = CSRFProtect()
+
+DATABASE_NAME = "calc.db"
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
+
+def create_app():
+    app = Flask(__name__)
+
+    secret_key = os.environ.get("SECRET_KEY")
+    if not secret_key:
+        if os.environ.get("FLASK_ENV") == "production":
+            raise RuntimeError(
+                "SECRET_KEY environment variable must be set in production."
+            )
+        secret_key = os.urandom(24).hex()
+    app.config["SECRET_KEY"] = secret_key
+
+    db_path = os.path.join(BASE_DIR, "instance", DATABASE_NAME)
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+        "DATABASE_URL", f"sqlite:///{db_path}"
+    )
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+    db.init_app(app)
+    csrf.init_app(app)
+
+    login_manager = LoginManager()
+    login_manager.login_view = "auth.login"
+    login_manager.init_app(app)
+
+    from models import User
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return db.session.get(User, int(user_id))
+
+    from auth import auth
+    from views import views
+
+    app.register_blueprint(auth, url_prefix="/auth")
+    app.register_blueprint(views, url_prefix="/")
+
+    with app.app_context():
+        create_db()
+
+    return app
+
+
+def create_db():
+    """Create tables if the sqlite file doesn't exist yet. Safe to call
+    repeatedly; db.create_all() is a no-op for tables that already exist."""
+    instance_dir = os.path.join(BASE_DIR, "instance")
+    os.makedirs(instance_dir, exist_ok=True)
+    db_file = os.path.join(instance_dir, DATABASE_NAME)
+    if not os.path.exists(db_file):
+        db.create_all()
+        print(f"Created new database at {db_file}")

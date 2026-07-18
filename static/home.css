@@ -1,0 +1,8 @@
+.home-container {
+    background-image:
+        linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
+        url("{{ url_for('static', filename='home.png') }}");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}

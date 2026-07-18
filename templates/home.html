@@ -1,22 +1,417 @@
-<html>
-{%extends "base.html"%}
-{%block title%} home page{%endblock%}
-<body>
-   < h1>
-{%block content%}
-<div class="home-container">
+{% extends "base.html" %}
+{% block title %}Home Page{% endblock %}
 
-    <style >
-        .home-container{
-            background-image: linear-gadient(rbga(0,0,0,0.5)), url("static/home.png");
-            background-size:cover;
-            background-position:center;
-            background-repeat:no-repeat;
-            margin:0;
-            height:100vh;
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}" type="text/css" media="all" />
+<style>
+    #home {
+        text-align: center;
+        background-image: url("{{ url_for('static', filename='home.png') }}");
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+        color: white;
+        min-height: 100dvh;
+        font-family: Georgia, serif;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-}
-    </style>
-</div>
-</body>
-{%endblock%}</html>
+    .home-container {
+        border: 1px solid rgba(255,255,255,0.3);
+        border-radius: 20px;
+        max-width: 800px;
+        width: 100%;
+        padding: 60px 40px;
+        backdrop-filter: blur(16px);
+        background:transparent ;
+        box-shadow: 0 10px 30px #009D47;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .title {
+        font-size: 3.5rem;
+        margin: 0;
+        text-shadow: 0 4px 8px rgba(0,0,0,0.6);
+    }
+
+    .text p {
+        font-size: 1.4rem;
+        max-width: 600px;
+        margin: 1.5rem auto;
+    }
+
+    .button-container {
+        margin-top: 2rem;
+    }
+
+    .button-container button {
+        height: 70px;
+        width: 100%;
+        max-width: 320px;
+        margin: 0 auto;
+        color: white;
+        font-family: 'Segoe UI', sans-serif;
+        font-size: 1.8rem;
+        font-weight: 600;
+        background: transparent;
+        border: 3px solid #502B00;
+        border-radius: 50px;
+        box-shadow: 0 8px 16px rgba(191, 168, 128, 0.4);
+        transition: all 0.4s ease;
+        cursor: pointer;
+    }
+
+    .button-container button:hover {
+        background: #381F00;
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(191, 168, 128, 0.6);
+        color: #ddd;
+    }
+
+    #entry {
+        padding: 40px 20px;
+        background: #f8f9fa;
+        min-height: 100dvh;
+        transition: ease 0.4s;
+        display: none;
+    }
+
+    .form-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 40px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .form-container h2, .form-container p {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .section {
+        margin-bottom: 3rem;
+        padding: 1.5rem;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        background: #fafafa;
+    }
+
+    .section h3 {
+        margin-bottom: 1rem;
+        color: #333;
+        border-bottom: 2px solid #008EEC;
+        padding-bottom: 0.5rem;
+    }
+
+    .radio-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.2rem;
+        margin: 1rem 0;
+    }
+
+    .radio-group label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    input[type="radio"] {
+        accent-color: #008EEC;
+    }
+
+    .other-container {
+        margin-top: 1rem;
+    }
+
+    .form-row {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+
+    input[type="number"], input[type="text"], select {
+        padding: 10px 14px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border 0.3s;
+    }
+
+    input[type="number"]:focus, input[type="text"]:focus, select:focus {
+        border-color: #008EEC;
+        outline: none;
+    }
+
+    label {
+        font-weight: 500;
+        min-width: 140px;
+    }
+
+    .step {
+        display: none;
+    }
+
+    .step.active {
+        display: block;
+    }
+
+    .nav-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 2rem;
+    }
+    #prev-btn,#next-btn,#submit-btn{
+        height: 40px;
+        width: 100px;
+        font-size: 20px;
+        outline: none;
+        border: 0;
+        border-radius:16px;
+        font-weight:400px;
+        background: #008E85;
+        color: white;
+        transition:transform 0.4s ease;
+    }
+    #prev-btn:hover,#next-btn:hover,#submit-btn:hover{
+        transform: translateY(5px);
+        background: #007466;
+        width:90px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section id="home">
+    <div class="home-container">
+        <h1 class="title">Cosmic Carbon Calculator</h1>
+        <small>Legacy through open system integration</small>
+        
+        <div class="text">
+            <p>Changing generations through fighting carbon consumption</p>
+        </div>
+        
+        <div class="button-container">
+            <button id="continue">Continue</button>
+        </div>
+    </div>
+</section>
+
+<section id="entry">
+    <div class="form-container">
+        <h2>Carbon Footprint Assessment</h2>
+        <p>Fill in the following information to continue</p>
+
+        <form id="carbon-form" action="/submit" method="POST">
+            
+            <!-- Transport Step -->
+            <div class="section step active" id="step-transport">
+                <h3>Transportation</h3>
+                
+                <div class="radio-group">
+                    <div>
+                        <input type="radio" id="car" name="transport" value="car">
+                        <label for="car">Car</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="bus" name="transport" value="bus">
+                        <label for="bus">Bus</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="motor-cycle" name="transport" value="motorcycle">
+                        <label for="motor-cycle">Motorcycle</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="electric-train" name="transport" value="electric-train">
+                        <label for="electric-train">Electric Train</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="thermo-train" name="transport" value="thermo-train">
+                        <label for="thermo-train">Thermo Train</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="bicycle" name="transport" value="bicycle">
+                        <label for="bicycle">Bicycle</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="other-transport" name="transport" value="other">
+                        <label for="other-transport">Other</label>
+                    </div>
+                </div>
+
+                <div class="other-container" id="other-transport-container" style="display:none;">
+                    <label for="othermeans">Specify other means of transport:</label>
+                    <input type="text" id="othermeans" name="other_transport" placeholder="e.g. Walking, Scooter...">
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <label>How often do you use this transport per week?</label>
+                    <div class="radio-group">
+                        <div><input type="radio" name="frequency" value="1"> <label>Once</label></div>
+                        <div><input type="radio" name="frequency" value="2"> <label>Twice</label></div>
+                        <div><input type="radio" name="frequency" value="3"> <label>Thrice</label></div>
+                        <div>
+                            <input type="radio" name="frequency" value="multiple" id="freq-multiple">
+                            <label for="freq-multiple">Multiple</label>
+                        </div>
+                    </div>
+                    <input type="number" id="multi-frequency" name="frequency_custom" placeholder="Times per week" style="display:none; width:200px;" min="1">
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <label>Estimated weekly transport expense</label>
+                    <div class="form-row">
+                        <input type="number" name="transport_expense" placeholder="Amount" style="width:180px;">
+                        <select name="transport_currency">
+                            <option value="">Currency</option>
+                            <option value="USD">USD ($)</option>
+                            <option value="UGX">UGX</option>
+                            <option value="EUR">EURO (€)</option>
+                            <option value="OTHER">Other</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Housing Step -->
+            <div class="section step" id="step-housing">
+                <h3>Housing</h3>
+                <div class="form-row">
+                    <label for="house_no">Number of houses:</label>
+                    <input type="number" name="house_no" id="house_no" min="0">
+                </div>
+                <div class="form-row">
+                    <label for="adults">Number of adults:</label>
+                    <input type="number" name="adults" id="adults" min="0">
+                </div>
+                <div class="form-row">
+                    <label for="children">Number of children:</label>
+                    <input type="number" name="children" id="children" min="0">
+                </div>
+                <div class="form-row">
+                    <label for="livestock">Number of livestock:</label>
+                    <input type="number" name="livestock" id="livestock" min="0">
+                </div>
+                <div class="form-row">
+                    <label for="pets">Number of pets:</label>
+                    <input type="number" name="pets" id="pets" min="0">
+                </div>
+                <div class="form-row">
+                    <label for="trees">Number of trees on property:</label>
+                    <input type="number" name="trees" id="trees" min="0">
+                </div>
+            </div>
+
+            <!-- Energy Step -->
+            <div class="section step" id="step-energy">
+                <h3>Domestic Energy Source</h3>
+                <div class="radio-group">
+                    <div><input type="radio" name="fuel" id="gas" value="gas"><label for="gas">Gas</label></div>
+                    <div><input type="radio" name="fuel" id="petro" value="petroleum"><label for="petro">Petroleum</label></div>
+                    <div><input type="radio" name="fuel" id="coal" value="coal"><label for="coal">Coal</label></div>
+                    <div><input type="radio" name="fuel" id="charcoal" value="charcoal"><label for="charcoal">Charcoal</label></div>
+                    <div><input type="radio" name="fuel" id="electricity" value="electricity"><label for="electricity">Electricity</label></div>
+                    <div><input type="radio" name="fuel" id="wood" value="wood"><label for="wood">Firewood</label></div>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <label>Estimated monthly energy expense</label>
+                    <div class="form-row">
+                        <input type="number" name="energy_expense" placeholder="Amount">
+                        <select name="energy_currency">
+                            <option value="">Currency</option>
+                            <option value="USD">USD ($)</option>
+                            <option value="UGX">UGX</option>
+                            <option value="EUR">EURO (€)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button type="button" id="prev-btn" style="display:none;">Previous</button>
+                <button type="button" id="next-btn">Next</button>
+                <button type="submit" id="submit-btn" style="display:none; background:#008EEC; color:white;">Submit</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<script>
+    let currentStep = 0;
+    const steps = document.querySelectorAll('.step');
+    const nextBtn = document.getElementById('next-btn');
+    const prevBtn = document.getElementById('prev-btn');
+    const submitBtn = document.getElementById('submit-btn');
+
+    function showStep(n) {
+        steps.forEach((step, i) => {
+            step.classList.toggle('active', i === n);
+        });
+        
+        prevBtn.style.display = n > 0 ? 'block' : 'none';
+        nextBtn.style.display = n < steps.length - 1 ? 'block' : 'none';
+        submitBtn.style.display = n === steps.length - 1 ? 'block' : 'none';
+    }
+    submitBtn.addEventListener('click',()=>{
+         await fetch('/submit',{
+            method: 'POST',
+            body: new FormData(form)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Server responded with ${response.status}`);
+        });   
+    });
+    nextBtn.addEventListener('click', () => {
+        if (currentStep < steps.length - 1) {
+            currentStep++;
+            showStep(currentStep);
+        }
+    });
+
+    prevBtn.addEventListener('click', () => {
+        if (currentStep > 0) {
+            currentStep--;
+            showStep(currentStep);
+        }
+    });
+
+    const otherRadio = document.getElementById('other-transport');
+    const otherContainer = document.getElementById('other-transport-container');
+    
+    document.querySelectorAll('input[name="transport"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            otherContainer.style.display = otherRadio.checked ? 'block' : 'none';
+        });
+    });
+    
+    const freqMultiple = document.getElementById('freq-multiple');
+    const multiFreqInput = document.getElementById('multi-frequency');
+    
+    freqMultiple.addEventListener('change', () => {
+        multiFreqInput.style.display = freqMultiple.checked ? 'block' : 'none';
+    });
+
+    document.getElementById('continue').addEventListener('click', () => {
+        document.getElementById('home').style.display = 'none';
+        const entry=document.getElementById('entry');
+        entry.style.display="block";
+        entry.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // Initial state
+    showStep(0);
+</script>
+{% endblock %}

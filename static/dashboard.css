@@ -1,0 +1,70 @@
+
+.dash-container .stat-card .icon-bg {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    font-size: 2.2rem;
+    opacity: 0.10;
+    pointer-events: none;
+}
+.stat-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -30%;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 212, 116, 0.04) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.stat-card.green::after {
+    background: radial-gradient(circle, rgba(0, 212, 116, 0.07) 0%, transparent 70%);
+}
+.stat-card.orange::after {
+    background: radial-gradient(circle, rgba(245, 166, 35, 0.07) 0%, transparent 70%);
+}
+.stat-card.blue::after {
+    background: radial-gradient(circle, rgba(74, 163, 255, 0.07) 0%, transparent 70%);
+}
+.stat-card.purple::after {
+    background: radial-gradient(circle, rgba(179, 136, 255, 0.07) 0%, transparent 70%);
+}
+.stat-card.red::after {
+    background: radial-gradient(circle, rgba(255, 107, 107, 0.07) 0%, transparent 70%);
+}
+.history-table tbody tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+}
+.history-table-wrap {
+    -webkit-overflow-scrolling: touch;
+}
+
+.chart-box {
+    transition: border-color 0.25s ease;
+}
+.chart-box:hover {
+    border-color: rgba(0, 157, 71, 0.15);
+}
+
+/* Custom scrollbar for modern browsers */
+.dash-container::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+.dash-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+.dash-container::-webkit-scrollbar-thumb {
+    background: rgba(0, 157, 71, 0.35);
+    border-radius: 10px;
+}
+.dash-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 157, 71, 0.55);
+}
