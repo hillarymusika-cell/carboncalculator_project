@@ -78,7 +78,7 @@
         background: #f8f9fa;
         min-height: 100dvh;
         transition: ease 0.4s;
-        display: none;
+        display:block;
     }
 
     .form-container {
@@ -364,7 +364,7 @@
         nextBtn.style.display = n < steps.length - 1 ? 'block' : 'none';
         submitBtn.style.display = n === steps.length - 1 ? 'block' : 'none';
     }
-    submitBtn.addEventListener('click',()=>{
+    submitBtn.addEventListener('click',async ()=>{
          await fetch('/submit',{
             method: 'POST',
             body: new FormData(form)
@@ -372,7 +372,7 @@
 
         if (!response.ok) {
             throw new Error(`Server responded with ${response.status}`);
-        });   
+        }  
     });
     nextBtn.addEventListener('click', () => {
         if (currentStep < steps.length - 1) {

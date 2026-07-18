@@ -211,7 +211,7 @@
                 <li><a href="{{ url_for('views.about') }}">About</a></li>
                 <li><button class="back" id="recent" type="button">Recent</button></li>
                 <li><button class="back" id="back" type="button">&larr; Back</button></li>
-                <li><button class="back" id="exit" type="button">&times; Exit</button></li>
+                <li><a class="back" href="{{ url_for('auth.logout') }}">Logout</a></li>
                 {%else%}
                 <li><a href="{{ url_for('auth.signup') }}">Sign up</a></li>
                 <li><a href="{{ url_for('auth.login') }}">Login</a></li>

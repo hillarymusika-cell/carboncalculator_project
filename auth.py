@@ -16,8 +16,8 @@ def login():
     if request.method == "GET":
         return render_template("login.html",user=current_user)
 
-    email = (request.form.get("email") or "").strip().lower()
-    password = request.form.get("password") or ""
+    email = (request.form.get("login-email") or "").strip().lower()
+    password = request.form.get("login-password") or ""
 
     if not email or not password:
         return jsonify({"message": "Email and password are required.", "redirect": "/auth/login"}), 400
