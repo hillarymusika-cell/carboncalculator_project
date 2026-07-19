@@ -269,20 +269,6 @@
                     </div>
                     <input type="number" id="multi-frequency" name="frequency_custom" placeholder="Times per week" style="display:none; width:200px;" min="1">
                 </div>
-
-                <div style="margin-top: 2rem;">
-                    <label>Estimated weekly transport expense</label>
-                    <div class="form-row">
-                        <input type="number" name="transport_expense" placeholder="Amount" style="width:180px;">
-                        <select name="transport_currency">
-                            <option value="">Currency</option>
-                            <option value="USD">USD ($)</option>
-                            <option value="UGX">UGX</option>
-                            <option value="EUR">EURO (€)</option>
-                            <option value="OTHER">Other</option>
-                        </select>
-                    </div>
-                </div>
             </div>
 
             <!-- Housing Step -->
@@ -295,10 +281,6 @@
                 <div class="form-row">
                     <label for="adults">Number of adults:</label>
                     <input type="number" name="adults" id="adults" min="0">
-                </div>
-                <div class="form-row">
-                    <label for="children">Number of children:</label>
-                    <input type="number" name="children" id="children" min="0">
                 </div>
                 <div class="form-row">
                     <label for="livestock">Number of livestock:</label>
@@ -329,13 +311,7 @@
                 <div style="margin-top: 2rem;">
                     <label>Estimated monthly energy expense</label>
                     <div class="form-row">
-                        <input type="number" name="energy_expense" placeholder="Amount">
-                        <select name="energy_currency">
-                            <option value="">Currency</option>
-                            <option value="USD">USD ($)</option>
-                            <option value="UGX">UGX</option>
-                            <option value="EUR">EURO (€)</option>
-                        </select>
+                        <input type="number" name="energy_expense" placeholder="Amount in local currency">
                     </div>
                 </div>
             </div>

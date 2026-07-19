@@ -5,6 +5,8 @@ from datetime import datetime
 from calculator import (
     Electricity,
     Fuel,
+    Transport,
+    EnhancedFuel,
     Diet,
     Trees,
     Buildings,
@@ -36,23 +38,39 @@ def submit():
     try:
         footprint = CarbonFootprint()
         
-        # Transport - use frequency or expense
+        # Transport - frequency or expense (in km per week)
         if "frequency" in data and data.get("frequency"):
             frequency = data.get("frequency")
             if frequency == "multiple" and "frequency_custom" in data:
-                frequency = data.get("frequency_custom", 0)
-            if frequency and frequency != "multiple":
-                footprint.add(Fuel(frequency))
+                frequency = float(data.get("frequency_custom", 0))
+            elif frequency != "multiple":
+                frequency = float(frequency)
+            else:
+                frequency = 0
+            
+            if frequency > 0:
+                # Assume average ~50km per use
+                km_per_week = frequency * 50
+                transport_type = data.get("transport", "car")
+                footprint.add(Transport(km_per_week, transport_type=transport_type))
         
-        if "transport_expense" in data and data.get("transport_expense"):
-            footprint.add(Fuel(data.get("transport_expense")))
+        # Alternative: Transport expense in currency (fallback)
+        elif "transport_expense" in data and data.get("transport_expense"):
+            # Assume £1 = 0.5kg CO2e average
+            expense = float(data.get("transport_expense", 0))
+            footprint.add(Transport(expense * 0.5, transport_type="car"))
         
         # Fuel/Energy - handle based on fuel type
         if "fuel" in data and data.get("fuel"):
-            if data.get("fuel") == "electricity" and "energy_expense" in data and data.get("energy_expense"):
-                footprint.add(Electricity(data.get("energy_expense")))
-            elif data.get("fuel") and "energy_expense" in data and data.get("energy_expense"):
-                footprint.add(Fuel(data.get("energy_expense")))
+            fuel_type = data.get("fuel")
+            if "energy_expense" in data and data.get("energy_expense"):
+                energy_amount = float(data.get("energy_expense", 0))
+                if fuel_type == "electricity":
+                    footprint.add(Electricity(energy_amount))
+                else:
+                    footprint.add(EnhancedFuel(energy_amount, fuel_type=fuel_type))
+        
+        # Housing and lifestyle
         if "livestock" in data and data.get("livestock"):
             footprint.add(Diet(data.get("livestock")))
         if "pets" in data and data.get("pets"):
@@ -63,7 +81,7 @@ def submit():
             footprint.add(Trees(data.get("trees")))
         if "house_no" in data and data.get("house_no"):
             footprint.add(Buildings(data.get("house_no")))                                               
-    except InvalidUnitsError as e:
+    except (InvalidUnitsError, ValueError) as e:
         return jsonify({"message": str(e)}), 400
 
     if not footprint.sources:

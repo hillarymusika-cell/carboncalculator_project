@@ -425,34 +425,236 @@
 </section>
 
 <script>
-    try{
-        const response = await fetch('/submit', {
-            method: 'POST',
-            body: new FormData(form)
-        });
-
-        if (!response.ok){
-            throw new Error(`Server responded with ${response.status}`);
-        }
-        const result = await response.json();
-        updateDashboard(result);
-        addHistoryRow(result);
-        showPage('dashboard');
-    } catch (error){
-        console.error(error);
-        formError.textContent = 'Something went wrong submitting your entry. Please try again.';
-        formError.hidden = false;
-    }
     function updateDashboard(result){
-           setText('.total-value', result.total_kg_co2e); 
-           setText('.transport-value', result.distance);
-           setText('.housing-value', result.distance);
-           setText('.energy-value', result.distance);
-           setText('.distance-value', result.distance);
-           setText('.offset-value', result.distance);
-       }
-       function addHistoryRow(){}
-       function showPage(){}
+        if (!result || !result.breakdown) return;
+        
+        const breakdown = result.breakdown;
+        const total = result.total_kg_co2e || 0;
+        
+        // Convert kg to tonnes
+        const totalTonnes = (total / 1000).toFixed(2);
+        setText('.total-value', totalTonnes + ' t');
+        
+        // Extract values from breakdown
+        const transport = (breakdown.Transport || 0) / 1000;
+        const electricity = (breakdown.Electricity || 0) / 1000;
+        const enhancedFuel = (breakdown.EnhancedFuel || 0) / 1000;
+        const diet = (breakdown.Diet || 0) / 1000;
+        const buildings = (breakdown.Buildings || 0) / 1000;
+        const trees = (breakdown.Trees || 0) / 1000;
+        
+        setText('.transport-value', transport.toFixed(2) + ' t');
+        setText('.housing-value', buildings.toFixed(2) + ' t');
+        setText('.energy-value', (electricity + enhancedFuel).toFixed(2) + ' t');
+        setText('.offset-value', Math.abs(trees).toFixed(2) + ' t');
+    }
+    
+    function addHistoryRow(result) {
+        if (!result || !result.total_kg_co2e) return;
+        
+        const breakdown = result.breakdown || {};
+        const table = document.querySelector('.history-table tbody');
+        if (!table) return;
+        
+        const newRow = document.createElement('tr');
+        const now = new Date();
+        const dateStr = now.toISOString().split('T')[0];
+        
+        const transport = (breakdown.Transport || 0) / 1000;
+        const buildings = (breakdown.Buildings || 0) / 1000;
+        const energy = ((breakdown.Electricity || 0) + (breakdown.EnhancedFuel || 0)) / 1000;
+        const total = result.total_kg_co2e / 1000;
+        
+        let status = 'Low';
+        if (total > 3.5) status = 'High';
+        else if (total > 2.5) status = 'Medium';
+        
+        newRow.innerHTML = `
+            <td>${dateStr}</td>
+            <td>${transport.toFixed(2)} t</td>
+            <td>${buildings.toFixed(2)} t</td>
+            <td>${energy.toFixed(2)} t</td>
+            <td>${total.toFixed(2)} t</td>
+            <td><span class="badge-status ${status.toLowerCase()}">${status}</span></td>
+        `;
+        
+        table.insertBefore(newRow, table.firstChild);
+    }
+    
+    function showPage(page) {
+        // Hide all sections and show the requested one
+        const sections = document.querySelectorAll('section');
+        sections.forEach(s => s.style.display = 'none');
+        
+        if (page === 'dashboard') {
+            const dashboard = document.getElementById('dashboard');
+            if (dashboard) dashboard.style.display = 'block';
+        }
+    }
+    
+    async function loadHistory() {
+        try {
+            const response = await fetch('/history');
+            if (!response.ok) throw new Error('Failed to load history');
+            
+            const data = await response.json();
+            if (!data.history || !Array.isArray(data.history)) return;
+            
+            const table = document.querySelector('.history-table tbody');
+            if (!table) return;
+            
+            // Clear dummy rows
+            table.innerHTML = '';
+            
+            // Populate with real history
+            let chartData = {
+                labels: [],
+                transport: [],
+                housing: [],
+                energy: [],
+                total: []
+            };
+            
+            data.history.forEach((entry, idx) => {
+                if (!entry.search) return;
+                
+                const breakdown = entry.search.breakdown || {};
+                const total = entry.search.total_kg_co2e || 0;
+                const transport = (breakdown.Transport || 0) / 1000;
+                const buildings = (breakdown.Buildings || 0) / 1000;
+                const energy = ((breakdown.Electricity || 0) + (breakdown.EnhancedFuel || 0)) / 1000;
+                const totalTonnes = total / 1000;
+                
+                // Add to chart data (limit to 6 most recent)
+                if (idx < 6) {
+                    const date = entry.time ? new Date(entry.time).toLocaleDateString() : `Entry ${idx + 1}`;
+                    chartData.labels.unshift(date);
+                    chartData.transport.unshift(transport);
+                    chartData.housing.unshift(buildings);
+                    chartData.energy.unshift(energy);
+                    chartData.total.unshift(totalTonnes);
+                }
+                
+                // Add to table
+                const row = document.createElement('tr');
+                let status = 'Low';
+                if (totalTonnes > 3.5) status = 'High';
+                else if (totalTonnes > 2.5) status = 'Medium';
+                
+                row.innerHTML = `
+                    <td>${entry.time ? new Date(entry.time).toLocaleDateString() : 'N/A'}</td>
+                    <td>${transport.toFixed(2)} t</td>
+                    <td>${buildings.toFixed(2)} t</td>
+                    <td>${energy.toFixed(2)} t</td>
+                    <td>${totalTonnes.toFixed(2)} t</td>
+                    <td><span class="badge-status ${status.toLowerCase()}">${status}</span></td>
+                `;
+                table.appendChild(row);
+            });
+            
+            // Update charts with real data
+            updateCharts(chartData);
+        } catch (error) {
+            console.error('Error loading history:', error);
+        }
+    }
+    
+    function updateCharts(data) {
+        // Update category chart
+        const categoryChart = Chart.helpers.get(document.getElementById('categoryChart'));
+        if (categoryChart) {
+            categoryChart.destroy();
+        }
+        
+        const ctx1 = document.getElementById('categoryChart').getContext('2d');
+        const avgTransport = data.transport.length ? (data.transport.reduce((a, b) => a + b) / data.transport.length) : 0;
+        const avgHousing = data.housing.length ? (data.housing.reduce((a, b) => a + b) / data.housing.length) : 0;
+        const avgEnergy = data.energy.length ? (data.energy.reduce((a, b) => a + b) / data.energy.length) : 0;
+        
+        new Chart(ctx1, {
+            type: 'doughnut',
+            data: {
+                labels: ['Transport', 'Housing', 'Energy'],
+                datasets: [{
+                    data: [avgTransport, avgHousing, avgEnergy],
+                    backgroundColor: ['#f5a623', '#4aa3ff', '#b388ff'],
+                    borderColor: ['#0b0e14', '#0b0e14', '#0b0e14'],
+                    borderWidth: 3,
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                cutout: '64%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#c8d6e8',
+                            font: { size: 12, weight: '500' },
+                            padding: 16,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Update trend chart
+        const trendChart = Chart.helpers.get(document.getElementById('trendChart'));
+        if (trendChart) {
+            trendChart.destroy();
+        }
+        
+        const ctx2 = document.getElementById('trendChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: data.labels.slice(0, 6),
+                datasets: [{
+                    label: 'tCO₂e',
+                    data: data.total.slice(0, 6),
+                    borderColor: '#00d474',
+                    backgroundColor: 'rgba(0, 212, 116, 0.08)',
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#00d474',
+                    pointBorderColor: '#0b0e14',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        labels: { color: '#c8d6e8', font: { size: 12 } }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y.toFixed(2) + ' tCO₂e';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: { color: '#7e96b5' },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                    },
+                    x: {
+                        ticks: { color: '#7e96b5' },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                    }
+                }
+            }
+        });
+    }
        
        
        function setText(selector, value) {
@@ -489,96 +691,8 @@
  }
 
     document.addEventListener('DOMContentLoaded', function() {
-        const ctx1 = document.getElementById('categoryChart').getContext('2d');
-        new Chart(ctx1, {
-            type: 'doughnut',
-            data: {
-                labels: ['Transport', 'Housing', 'Energy'],
-                datasets: [{
-                    data: [1.12, 0.96, 0.76],
-                    backgroundColor: ['#f5a623', '#4aa3ff', '#b388ff'],
-                    borderColor: ['#0b0e14', '#0b0e14', '#0b0e14'],
-                    borderWidth: 3,
-                    hoverOffset: 8
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                cutout: '64%',
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            color: '#c8d6e8',
-                            font: { size: 12, weight: '500' },
-                            padding: 16,
-                            usePointStyle: true,
-                            pointStyle: 'circle'
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                let pct = ((context.parsed / total) * 100).toFixed(1);
-                                return context.label + ': ' + context.parsed.toFixed(2) + ' tCO₂e (' + pct +
-                                    '%)';
-                            }
-                        }
-                    }
-                }
-            }
-        });
-        const ctx2 = document.getElementById('trendChart').getContext('2d');
-        new Chart(ctx2, {
-            type: 'line',
-            data: {
-                labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6'],
-                datasets: [{
-                    label: 'tCO₂e',
-                    data: [3.4, 3.8, 2.9, 3.2, 2.5, 2.84],
-                    borderColor: '#00d474',
-                    backgroundColor: 'rgba(0, 212, 116, 0.08)',
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#00d474',
-                    pointBorderColor: '#0b0e14',
-                    pointBorderWidth: 2,
-                    pointRadius: 5,
-                    pointHoverRadius: 8,
-                    borderWidth: 3
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.parsed.y + ' tCO₂e';
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { color: 'rgba(255,255,255,0.06)' },
-                        ticks: { color: '#7e96b5', font: { size: 11 } }
-                    },
-                    x: {
-                        grid: { display: false },
-                        ticks: { color: '#7e96b5', font: { size: 11 } }
-                    }
-                }
-            }
-        });
-
+        // Load and display user's carbon footprint history
+        loadHistory();
     });
 </script>
 {% endblock %}

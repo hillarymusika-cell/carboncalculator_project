@@ -43,9 +43,14 @@ def login():
     
 
 
-@auth.route("/logout")
+@auth.route("/logout", methods=["GET", "POST"])
 @login_required
 def logout():
+    current_user.is_online = False
+    try:
+        db.session.commit()
+    except SQLAlchemyError:
+        db.session.rollback()
     logout_user()
     return jsonify({"message": "Logged out", "redirect": "/auth/login"})
 

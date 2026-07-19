@@ -203,9 +203,8 @@
                 {%if user.is_authenticated%}
                 <li><a class="nav-item" href="{{ url_for('views.home') }}">Home</a></li>
                 <li><a href="{{ url_for('views.about') }}">About</a></li>
+                <li><a class="back" id="logout">Logout</a></li>
                 <li><button class="back" id="recent" type="button">Recent</button></li>
-                <li><button class="back" id="back" type="button">&larr; Back</button></li>
-                <li><a class="back" href="{{ url_for('auth.logout') }}">Logout</a></li>
                 {%else%}
                 <li><a href="{{ url_for('auth.signup') }}">Sign up</a></li>
                 <li><a href="{{ url_for('auth.login') }}">Login</a></li>
@@ -250,9 +249,26 @@
 
             menu.addEventListener("click", toggleMenu);
             back.addEventListener("click", closeMenu);
-            exit.addEventListener("click", closeMenu);
+            logout.addEventListener("click",()=>{
+                fetch("/auth/logout", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": "{{ csrf_token() }}"
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        window.location.href = "{{ url_for('auth.login') }}";
+                    } else {
+                        console.error("Logout failed");
+                    }
+                }).catch(error => {
+                    console.error("Error during logout:", error);
+                });
+            }
 
-            // Close the menu with Escape for keyboard users
+             );
+
             document.addEventListener("keydown", (e) => {
                 if (e.key === "Escape" && navBar.classList.contains("open")) {
                     closeMenu();
