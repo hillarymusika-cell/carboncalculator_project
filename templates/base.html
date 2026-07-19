@@ -6,7 +6,6 @@
     <title>{% block title %}base template{% endblock %}</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{{ url_for('static', filename='nav.css') }}" type="text/css" media="all" />
     {% block style %}{% endblock %}
 
     <style>
@@ -38,9 +37,6 @@
             margin: 4px 0;
             list-style: none;
         }
-
-        /* ---------- Nav bar ---------- */
-
         .nav-bar{
             position: fixed;
             top: 0;
@@ -187,8 +183,6 @@
         #exit:hover{
             color: #ffb3b3;
         }
-
-        /* push page content below the fixed bar */
         .page-content{
             padding-top: 80px;
         }
@@ -225,8 +219,8 @@
         {% block content %}{% endblock %}
     </div>
 
-    <script src="{{ url_for('static', filename='nav.js') }}" type="text/javascript" charset="utf-8"></script>
-    <script>
+    <script type="text/javascript" charset="utf-8">
+
         (function () {
             const menu   = document.getElementById("menu");
             const back   = document.getElementById("back");

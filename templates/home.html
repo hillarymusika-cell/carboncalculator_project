@@ -210,6 +210,7 @@
 
 <section id="entry">
     <div class="form-container">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <h2>Carbon Footprint Assessment</h2>
         <p>Fill in the following information to continue</p>
 
@@ -364,15 +365,26 @@
         nextBtn.style.display = n < steps.length - 1 ? 'block' : 'none';
         submitBtn.style.display = n === steps.length - 1 ? 'block' : 'none';
     }
-    submitBtn.addEventListener('click',async ()=>{
-         await fetch('/submit',{
-            method: 'POST',
-            body: new FormData(form)
-        });
+    submitBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const form = document.getElementById('carbon-form');
+        try {
+            const response = await fetch('/submit', {
+                method: 'POST',
+                body: new FormData(form)
+            });
 
-        if (!response.ok) {
-            throw new Error(`Server responded with ${response.status}`);
-        }  
+            if (!response.ok) {
+                throw new Error(`Server responded with ${response.status}`);
+            }
+            const result = await response.json();
+            console.log('Submission successful:', result);
+            // Handle success - show results or redirect
+            alert(`Carbon footprint: ${result.total_kg_co2e} kg CO2e`);
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Something went wrong submitting your entry. Please try again.');
+        }
     });
     nextBtn.addEventListener('click', () => {
         if (currentStep < steps.length - 1) {

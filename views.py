@@ -35,23 +35,33 @@ def submit():
 
     try:
         footprint = CarbonFootprint()
-        if "electricity" in data:
-            footprint.add(Electricity(data.get("electricity")))
-        if "fuel" in data:
-            footprint.add(Fuel(data.get("fuel")))
-        if "transport" in data:
-            footprint.add(Fuel(data.get("transport")))
-        if "other-transport" in data:
-            footprint.add(Fuel(data.get("other-transport")))
-        if "livestock" in data:
+        
+        # Transport - use frequency or expense
+        if "frequency" in data and data.get("frequency"):
+            frequency = data.get("frequency")
+            if frequency == "multiple" and "frequency_custom" in data:
+                frequency = data.get("frequency_custom", 0)
+            if frequency and frequency != "multiple":
+                footprint.add(Fuel(frequency))
+        
+        if "transport_expense" in data and data.get("transport_expense"):
+            footprint.add(Fuel(data.get("transport_expense")))
+        
+        # Fuel/Energy - handle based on fuel type
+        if "fuel" in data and data.get("fuel"):
+            if data.get("fuel") == "electricity" and "energy_expense" in data and data.get("energy_expense"):
+                footprint.add(Electricity(data.get("energy_expense")))
+            elif data.get("fuel") and "energy_expense" in data and data.get("energy_expense"):
+                footprint.add(Fuel(data.get("energy_expense")))
+        if "livestock" in data and data.get("livestock"):
             footprint.add(Diet(data.get("livestock")))
-        if "pets" in data:
+        if "pets" in data and data.get("pets"):
             footprint.add(Diet(data.get("pets")))
-        if "adults" in data:
+        if "adults" in data and data.get("adults"):
             footprint.add(Diet(data.get("adults")))
-        if "trees" in data:
+        if "trees" in data and data.get("trees"):
             footprint.add(Trees(data.get("trees")))
-        if "house_no" in data:
+        if "house_no" in data and data.get("house_no"):
             footprint.add(Buildings(data.get("house_no")))                                               
     except InvalidUnitsError as e:
         return jsonify({"message": str(e)}), 400
@@ -74,3 +84,16 @@ def submit():
 def dashboard():
     if request.method == "GET":
         return render_template("dashboard.html",now=datetime.utcnow(),user=current_user)
+    try:
+        history= History.query.filter_by(user_id=current_user.id).order_by(History.time.desc()).first()
+    except SQLAlchemyError:
+        return jsonify({"message": "Something went wrong. Please try again."}), 500
+    return jsonify({"message":"Success","history":history}),200
+@views.route("/history",methods=["GET"])
+@login_required
+def history():
+    try:
+        history= History.query.filter_by(user_id=current_user.id).order_by(History.time.desc()).all()
+    except SQLAlchemyError:
+        return jsonify({"message": "Something went wrong. Please try again."}), 500
+    return jsonify({"message":"Tracking history","history":history}),200

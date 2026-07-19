@@ -429,19 +429,20 @@
         const response = await fetch('/submit', {
             method: 'POST',
             body: new FormData(form)
+        });
 
         if (!response.ok){
-            throw new Error(`Sever responded with ${response.status}`);
+            throw new Error(`Server responded with ${response.status}`);
         }
-        const result= await response.json();
+        const result = await response.json();
         updateDashboard(result);
         addHistoryRow(result);
         showPage('dashboard');
-    } catch (error){}      
+    } catch (error){
         console.error(error);
         formError.textContent = 'Something went wrong submitting your entry. Please try again.';
         formError.hidden = false;
-    });
+    }
     function updateDashboard(result){
            setText('.total-value', result.total_kg_co2e); 
            setText('.transport-value', result.distance);
