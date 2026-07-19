@@ -1,12 +1,3 @@
-"""
-Dev utility: print a password hash for manually seeding the database.
-
-The original hardcoded a real-looking password ("mypassword123") right
-in source control. Use it as a CLI tool instead so nothing sensitive
-gets committed:
-
-    python hash.py "MyS3cret!Pass"
-"""
 import sys
 import getpass
 
