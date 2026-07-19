@@ -34,7 +34,7 @@ def login():
         return jsonify({"message": "Incorrect password.", "redirect": "/auth/login"}), 401
 
     existing_user.is_online = True
-    login_user(existing_user,remember =True)
+    login_user(existing_user, remember=True)
     try:
         db.session.commit()
     except SQLAlchemyError:
@@ -84,7 +84,7 @@ def signup():
         )
         db.session.add(new_user)
         db.session.commit()
-        login_user(new_user,remember = True)
+        login_user(new_user, remember=True)
         return jsonify({"message": "Account created successfully!", "redirect": "/"}),200
     except SQLAlchemyError:
         db.session.rollback()

@@ -40,30 +40,19 @@ def submit():
         if "fuel" in data:
             footprint.add(Fuel(data.get("fuel")))
         if "transport" in data:
-            footprint.add(Diet(data.get("transport")))
+            footprint.add(Fuel(data.get("transport")))
         if "other-transport" in data:
-         footprint.add(Diet(data.get("other-transport")))         
-        if "frequency" in data:
-            footprint.add(Trees(data.get("frequency")))
-        if "transport_currency" in data:
-                 footprint.add(Diet(data.get("transport_currency"))) 
-        if "transport_expense" in data:
-            footprint.add(Diet(data.get("transport_expense"))) 
-                                   
-        if "energy_currency" in data:
-            footprint.add(Buildings(data.get("energy_currency")))
-        if "energy_expense" in data:
-            footprint.add(Buildings(data.get("energy_expense"))) 
+            footprint.add(Fuel(data.get("other-transport")))
         if "livestock" in data:
-            footprint.add(Buildings(data.get("livestock")))           
+            footprint.add(Diet(data.get("livestock")))
         if "pets" in data:
-                    footprint.add(Buildings(data.get("pets"))) 
-        if "trees" in data:
-            footprint.add(Buildings(data.get("trees")))
-        if "house_no" in data:
-            footprint.add(Buildings(data.get("house_no")))
+            footprint.add(Diet(data.get("pets")))
         if "adults" in data:
-            footprint.add(Buildings(data.get("adults")))                                               
+            footprint.add(Diet(data.get("adults")))
+        if "trees" in data:
+            footprint.add(Trees(data.get("trees")))
+        if "house_no" in data:
+            footprint.add(Buildings(data.get("house_no")))                                               
     except InvalidUnitsError as e:
         return jsonify({"message": str(e)}), 400
 
@@ -82,6 +71,6 @@ def submit():
     
 @views.route("/dashboard",methods=["GET","POST"])
 @login_required
-def dashbord():
+def dashboard():
     if request.method == "GET":
         return render_template("dashboard.html",now=datetime.utcnow(),user=current_user)
