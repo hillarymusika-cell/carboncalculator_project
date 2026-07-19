@@ -37,8 +37,7 @@ def submit():
 
     try:
         footprint = CarbonFootprint()
-        
-        # Transport - frequency or expense (in km per week)
+
         if "frequency" in data and data.get("frequency"):
             frequency = data.get("frequency")
             if frequency == "multiple" and "frequency_custom" in data:
@@ -49,18 +48,13 @@ def submit():
                 frequency = 0
             
             if frequency > 0:
-                # Assume average ~50km per use
                 km_per_week = frequency * 50
                 transport_type = data.get("transport", "car")
                 footprint.add(Transport(km_per_week, transport_type=transport_type))
-        
-        # Alternative: Transport expense in currency (fallback)
         elif "transport_expense" in data and data.get("transport_expense"):
-            # Assume £1 = 0.5kg CO2e average
             expense = float(data.get("transport_expense", 0))
             footprint.add(Transport(expense * 0.5, transport_type="car"))
         
-        # Fuel/Energy - handle based on fuel type
         if "fuel" in data and data.get("fuel"):
             fuel_type = data.get("fuel")
             if "energy_expense" in data and data.get("energy_expense"):
@@ -69,8 +63,6 @@ def submit():
                     footprint.add(Electricity(energy_amount))
                 else:
                     footprint.add(EnhancedFuel(energy_amount, fuel_type=fuel_type))
-        
-        # Housing and lifestyle
         if "livestock" in data and data.get("livestock"):
             footprint.add(Diet(data.get("livestock")))
         if "pets" in data and data.get("pets"):
@@ -80,7 +72,7 @@ def submit():
         if "trees" in data and data.get("trees"):
             footprint.add(Trees(data.get("trees")))
         if "house_no" in data and data.get("house_no"):
-            footprint.add(Buildings(data.get("house_no")))                                               
+            footprint.add(Buildings(data.get("house_no")))
     except (InvalidUnitsError, ValueError) as e:
         return jsonify({"message": str(e)}), 400
 
@@ -97,21 +89,39 @@ def submit():
 
     return jsonify(result)
     
-@views.route("/dashboard",methods=["GET","POST"])
+@views.route("/dashboard", methods=["GET", "POST"])
 @login_required
 def dashboard():
-    if request.method == "GET":
-        return render_template("dashboard.html",now=datetime.utcnow(),user=current_user)
+    latest_data = None
+    
     try:
-        history= History.query.filter_by(user_id=current_user.id).order_by(History.time.desc()).first()
+        history_record = History.query.filter_by(user_id=current_user.id).order_by(History.time.desc()).first()
+        if history_record:
+            latest_data = {
+                "id": history_record.id,
+                "search": history_record.search,
+                "time": history_record.time.isoformat() if history_record.time else None
+            }
     except SQLAlchemyError:
-        return jsonify({"message": "Something went wrong. Please try again."}), 500
-    return jsonify({"message":"Success","history":history}),200
-@views.route("/history",methods=["GET"])
+        pass
+    
+    if request.method == "POST":
+        return jsonify({"message": "Success", "history": latest_data}), 200
+    
+    return render_template("dashboard.html", now=datetime.utcnow(), user=current_user, latest_data=latest_data)
+@views.route("/history", methods=["GET"])
 @login_required
 def history():
     try:
-        history= History.query.filter_by(user_id=current_user.id).order_by(History.time.desc()).all()
+        history_records = History.query.filter_by(user_id=current_user.id).order_by(History.time.desc()).all()
     except SQLAlchemyError:
         return jsonify({"message": "Something went wrong. Please try again."}), 500
-    return jsonify({"message":"Tracking history","history":history}),200
+    history_data = []
+    for record in history_records:
+        history_data.append({
+            "id": record.id,
+            "search": record.search,
+            "time": record.time.isoformat() if record.time else None
+        })
+    
+    return jsonify({"message": "Tracking history", "history": history_data}), 200

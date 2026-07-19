@@ -1,4 +1,3 @@
-<!--
 {% extends "base.html" %}
 {% block title %}Dashboard{% endblock %}
 
@@ -424,7 +423,26 @@
     </div>
 </section>
 
+<script type="application/json" id="latestData">
+{{ latest_data.search | tojson if (latest_data and latest_data.search) else 'null' }}
+</script>
+
 <script>
+    // Initialize with latest data if available (server-side passed)
+    (function() {
+        const dataElement = document.getElementById('latestData');
+        if (dataElement) {
+            try {
+                const latestResult = JSON.parse(dataElement.textContent);
+                if (latestResult && latestResult.breakdown) {
+                    updateDashboard(latestResult);
+                }
+            } catch (e) {
+                console.warn('Could not parse latest data:', e);
+            }
+        }
+    })();
+    
     function updateDashboard(result){
         if (!result || !result.breakdown) return;
         
