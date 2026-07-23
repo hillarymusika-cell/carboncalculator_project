@@ -12,6 +12,9 @@ from calculator import (
     EnhancedFuel,
     Buildings,
     Trees,
+    Adults,
+    Livestock,
+    Pets,
     CarbonFootprint,
     InvalidUnitsError,
 )
@@ -68,6 +71,9 @@ def submit():
 
     house_no = _to_number(form.get("house_no"), default=0)
     trees = _to_number(form.get("trees"), default=0)
+    adults = _to_number(form.get("adults"), default=0)
+    livestock = _to_number(form.get("livestock"), default=0)
+    pets = _to_number(form.get("pets"), default=0)
 
     calc = CarbonFootprint()
     try:
@@ -78,6 +84,12 @@ def submit():
             calc.add(Buildings(house_no))
         if trees > 0:
             calc.add(Trees(trees))
+        if adults > 0:
+            calc.add(Adults(adults))
+        if livestock > 0:
+            calc.add(Livestock(livestock))
+        if pets > 0:
+            calc.add(Pets(pets))
     except InvalidUnitsError as e:
         return jsonify({"message": str(e)}), 400
 
@@ -91,6 +103,9 @@ def submit():
             "energy_expense": energy_expense,
             "house_no": house_no,
             "trees": trees,
+            "adults": adults,
+            "livestock": livestock,
+            "pets": pets,
         },
     }
 

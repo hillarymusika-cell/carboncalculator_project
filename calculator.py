@@ -88,6 +88,24 @@ class Buildings(EmissionSource):
     FACTOR = 15.0
 
 
+class Adults(EmissionSource):
+    # Placeholder: baseline monthly consumption footprint per adult (kg CO2e).
+    # Not sourced from a specific study -- validate before treating as accurate.
+    FACTOR = 45.0
+
+
+class Livestock(EmissionSource):
+    # Placeholder: monthly methane + feed footprint per animal (kg CO2e).
+    # Not sourced from a specific study -- validate before treating as accurate.
+    FACTOR = 180.0
+
+
+class Pets(EmissionSource):
+    # Placeholder: monthly footprint per pet, food + care (kg CO2e).
+    # Not sourced from a specific study -- validate before treating as accurate.
+    FACTOR = 40.0
+
+
 class CarbonFootprint:
     def __init__(self):
         self.sources = []

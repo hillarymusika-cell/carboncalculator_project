@@ -26,13 +26,14 @@
         const transport = (breakdown.Transport || 0) / 1000;
         const electricity = (breakdown.Electricity || 0) / 1000;
         const enhancedFuel = (breakdown.EnhancedFuel || 0) / 1000;
-        const diet = (breakdown.Diet || 0) / 1000;
         const buildings = (breakdown.Buildings || 0) / 1000;
         const trees = (breakdown.Trees || 0) / 1000;
+        const household = ((breakdown.Adults || 0) + (breakdown.Livestock || 0) + (breakdown.Pets || 0)) / 1000;
         
         setText('.transport-value', transport.toFixed(2) + ' t');
         setText('.housing-value', buildings.toFixed(2) + ' t');
         setText('.energy-value', (electricity + enhancedFuel).toFixed(2) + ' t');
+        setText('.household-value', household.toFixed(2) + ' t');
         setText('.offset-value', Math.abs(trees).toFixed(2) + ' t');
     }
     
@@ -61,6 +62,7 @@
                 transport: [],
                 housing: [],
                 energy: [],
+                household: [],
                 total: []
             };
             
@@ -72,6 +74,7 @@
                 const transport = (breakdown.Transport || 0) / 1000;
                 const buildings = (breakdown.Buildings || 0) / 1000;
                 const energy = ((breakdown.Electricity || 0) + (breakdown.EnhancedFuel || 0)) / 1000;
+                const household = ((breakdown.Adults || 0) + (breakdown.Livestock || 0) + (breakdown.Pets || 0)) / 1000;
                 const totalTonnes = total / 1000;
                 
                 const date = entry.time ? new Date(entry.time).toLocaleDateString() : 'N/A';
@@ -79,6 +82,7 @@
                 chartData.transport.push(transport);
                 chartData.housing.push(buildings);
                 chartData.energy.push(energy);
+                chartData.household.push(household);
                 chartData.total.push(totalTonnes);
                 
                 const row = document.createElement('tr');
@@ -91,6 +95,7 @@
                     <td>${transport.toFixed(2)} t</td>
                     <td>${buildings.toFixed(2)} t</td>
                     <td>${energy.toFixed(2)} t</td>
+                    <td>${household.toFixed(2)} t</td>
                     <td>${totalTonnes.toFixed(2)} t</td>
                     <td><span class="badge-status ${status.toLowerCase()}">${status}</span></td>
                 `;
@@ -98,7 +103,7 @@
             });
             
             if (entries.length === 0) {
-                table.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#7e96b5;">No entries yet. Submit the form to add one.</td></tr>';
+                table.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#7e96b5;">No entries yet. Submit the form to add one.</td></tr>';
             }
             
             updateCharts(chartData);
@@ -106,7 +111,7 @@
             console.error('Error loading history:', error);
             const table = document.getElementById('dashboard-history-body');
             if (table) {
-                table.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#7e96b5;">Could not load history.</td></tr>';
+                table.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#7e96b5;">Could not load history.</td></tr>';
             }
         }
     }
@@ -125,15 +130,16 @@
         const avgTransport = data.transport.length ? (data.transport.reduce((a, b) => a + b) / data.transport.length) : 0;
         const avgHousing = data.housing.length ? (data.housing.reduce((a, b) => a + b) / data.housing.length) : 0;
         const avgEnergy = data.energy.length ? (data.energy.reduce((a, b) => a + b) / data.energy.length) : 0;
+        const avgHousehold = data.household.length ? (data.household.reduce((a, b) => a + b) / data.household.length) : 0;
         
         categoryChartInstance = new Chart(ctx1, {
             type: 'doughnut',
             data: {
-                labels: ['Transport', 'Housing', 'Energy'],
+                labels: ['Transport', 'Housing', 'Energy', 'Household'],
                 datasets: [{
-                    data: [avgTransport, avgHousing, avgEnergy],
-                    backgroundColor: ['#f5a623', '#4aa3ff', '#b388ff'],
-                    borderColor: ['#0b0e14', '#0b0e14', '#0b0e14'],
+                    data: [avgTransport, avgHousing, avgEnergy, avgHousehold],
+                    backgroundColor: ['#f5a623', '#4aa3ff', '#b388ff', '#ffd93d'],
+                    borderColor: ['#0b0e14', '#0b0e14', '#0b0e14', '#0b0e14'],
                     borderWidth: 3,
                     hoverOffset: 8
                 }]
