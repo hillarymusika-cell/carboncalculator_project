@@ -12,7 +12,6 @@ db = SQLAlchemy()
 csrf = CSRFProtect()
 oauth = OAuth()
 
-DATABASE_NAME = "calc.db"
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -34,20 +33,21 @@ def create_app():
         secret_key = os.urandom(24).hex()
     app.config["SECRET_KEY"] = secret_key
 
-    db_path = os.path.join(BASE_DIR, "instance", DATABASE_NAME)
     app.config["SESSION_COOKIE_SECURE"] = True
     app.config["SESSION_COOKIE_HTTPONLY"] = True
     app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-    database_url = _normalize_database_url(os.environ.get("DATABASE_URL"))
-    app.config["SQLALCHEMY_DATABASE_URI"] = database_url or f"sqlite:///{db_path}" 
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"]= False
-    app.config["IS_POSTGRES"] = app.config["SQLALCHEMY_DATABASE_URI"].startswith("postgresql")
 
-    if app.config["IS_POSTGRES"]:
-        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-            "pool_pre_ping": True,
-            "pool_recycle": 280,
-        }
+    database_url = _normalize_database_url(os.environ.get("DATABASE_URL"))
+    if not database_url:
+        raise RuntimeError(
+            "DATABASE_URL environment variable must be set to a postgresql:// URI."
+        )
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+        "pool_pre_ping": True,
+        "pool_recycle": 280,
+    }
 
     db.init_app(app)
     csrf.init_app(app)
@@ -75,13 +75,5 @@ def create_app():
 
 
 def create_db(app):
-    if app.config["IS_POSTGRES"]:
-        db.create_all()
-        return
-
-    instance_dir = os.path.join(BASE_DIR, "instance")
-    os.makedirs(instance_dir, exist_ok=True)
-    db_file = os.path.join(instance_dir, DATABASE_NAME)
-    if not os.path.exists(db_file):
-        db.create_all()
-        print(f"Created new database at {db_file}")
+    db.create_all()
+    print("Database tables ensured on Postgres.")
