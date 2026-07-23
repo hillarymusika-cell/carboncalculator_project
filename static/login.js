@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const googleBtn = document.getElementById("google-sign");
   const homeUrl = (window.APP_ROUTES && window.APP_ROUTES.homeUrl) || "/";
 
-  // ---- Password visibility toggle ----
   const passwordInput = document.getElementById("login-password");
   const toggleBtn = document.getElementById("toggle-password");
   const toggleIcon = document.getElementById("toggle-password-icon");
@@ -16,7 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleBtn.setAttribute("aria-label", showing ? "Show password" : "Hide password");
   });
 
-  // ---- Form submission ----
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
@@ -52,9 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ---- Google sign-in placeholder ----
   googleBtn.addEventListener("click", () => {
-    // TODO: wire up to the real OAuth flow once the backend route exists.
-    alert("Google sign-in isn't set up yet.");
+    window.location.href = "{{ url_for('auth.google_login') }}";
   });
 });

@@ -6,12 +6,7 @@ from werkzeug.security import generate_password_hash
 
 
 def main():
-    """
-    Securely hash a password. Accepts password via getpass or environment
-    to prevent command-line argument exposure in process lists.
-    """
     if len(sys.argv) > 1:
-        # Security: Log warning if password passed via argument
         print(
             "WARNING: Passing passwords as command-line arguments is insecure "
             "and may expose them in process lists.",
@@ -25,7 +20,6 @@ def main():
         print("No password provided.", file=sys.stderr)
         sys.exit(1)
 
-    # Validate password is a string
     if not isinstance(password, str):
         print("Invalid password type.", file=sys.stderr)
         sys.exit(1)

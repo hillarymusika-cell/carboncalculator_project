@@ -24,7 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
   wireToggle("login-password", "toggle-password", "toggle-password-icon");
   wireToggle("confirm-password", "toggle-confirm-password", "toggle-confirm-password-icon");
 
-  // ---- Live password match check ----
   function checkPasswordsMatch() {
     const mismatch = confirmPassword.value.length > 0 && password.value !== confirmPassword.value;
     mismatchNote.hidden = !mismatch;
@@ -35,7 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
   password.addEventListener("input", checkPasswordsMatch);
   confirmPassword.addEventListener("input", checkPasswordsMatch);
 
-  // ---- Form submission ----
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
@@ -72,9 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ---- Google sign-in placeholder ----
   googleBtn.addEventListener("click", () => {
-    // TODO: wire up to the real OAuth flow once the backend route exists.
     alert("Google sign-in isn't set up yet.");
   });
 });

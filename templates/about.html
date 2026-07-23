@@ -1,1 +1,161 @@
-{%extends "base.html"%}
+{% extends "base.html" %}
+{% block title %}About{% endblock %}
+
+{% block style %}
+<style>
+    #about {
+        min-height: 100dvh;
+        padding: 120px 20px 60px;
+        background: linear-gradient(160deg, var(--teal-deep), var(--teal-base));
+        color: var(--paper);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    }
+
+    .about-container {
+        max-width: 860px;
+        margin: 0 auto;
+    }
+
+    .about-container h1 {
+        font-family: Georgia, serif;
+        font-size: 2.6rem;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    }
+
+    .about-container .lead {
+        color: var(--cyan-glow);
+        font-size: 1.15rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .about-card {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(0,199,210,0.25);
+        border-radius: 16px;
+        padding: 28px 30px;
+        margin-bottom: 24px;
+        text-align: left;
+        backdrop-filter: blur(6px);
+    }
+
+    .about-card h2 {
+        color: var(--cyan-accent);
+        font-size: 1.15rem;
+        margin-top: 0;
+        margin-bottom: 0.75rem;
+    }
+
+    .about-card p {
+        color: var(--muted);
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    .factors-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 14px;
+        margin-top: 16px;
+    }
+
+    .factor-pill {
+        background: rgba(0,199,210,0.08);
+        border: 1px solid rgba(0,199,210,0.2);
+        border-radius: 12px;
+        padding: 14px 16px;
+        text-align: left;
+    }
+
+    .factor-pill .name {
+        color: var(--paper);
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .factor-pill .desc {
+        color: var(--muted);
+        font-size: 0.82rem;
+        margin-top: 4px;
+    }
+
+    .about-cta {
+        margin-top: 2.5rem;
+    }
+
+    .about-cta a {
+        display: inline-block;
+        padding: 14px 32px;
+        border: 2px solid var(--cyan-accent);
+        border-radius: 50px;
+        color: var(--paper);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .about-cta a:hover {
+        background: var(--cyan-accent);
+        color: var(--teal-deep);
+        transform: translateY(-3px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section id="about">
+    <div class="about-container">
+        <h1>About the Cosmic Carbon Calculator</h1>
+        <p class="lead">Understand your footprint. Track it over time. Do something about it.</p>
+
+        <div class="about-card">
+            <h2>What this is</h2>
+            <p>
+                The Cosmic Carbon Calculator estimates the greenhouse gas emissions from everyday
+                choices — how you get around, how you power and heat your home, and how many trees
+                offset it all. Fill in a short assessment and get an instant breakdown, then come
+                back over time to see how your footprint trends on your dashboard.
+            </p>
+        </div>
+
+        <div class="about-card">
+            <h2>How it's calculated</h2>
+            <p>
+                Each category you enter is converted to kilograms of CO&#8322;e using published
+                per-unit emission factors, then combined into a single total. Trees on your
+                property count as a negative offset against your total.
+            </p>
+            <div class="factors-grid">
+                <div class="factor-pill">
+                    <div class="name">🚗 Transport</div>
+                    <div class="desc">Car, bus, motorcycle, train, or bicycle — by weekly frequency</div>
+                </div>
+                <div class="factor-pill">
+                    <div class="name">⚡ Energy</div>
+                    <div class="desc">Gas, petroleum, coal, charcoal, electricity, or firewood</div>
+                </div>
+                <div class="factor-pill">
+                    <div class="name">🏠 Housing</div>
+                    <div class="desc">Scaled by number of homes on the account</div>
+                </div>
+                <div class="factor-pill">
+                    <div class="name">🌳 Offset</div>
+                    <div class="desc">Trees on your property reduce your net total</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="about-card">
+            <h2>Your data</h2>
+            <p>
+                Every assessment you submit is saved to your account's history so your dashboard
+                can chart trends over time. Only you can see your own entries.
+            </p>
+        </div>
+
+        <div class="about-cta">
+            <a href="{{ url_for('views.home') }}">Start your assessment</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

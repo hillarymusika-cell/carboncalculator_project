@@ -206,7 +206,6 @@ body {
     text-decoration: underline;
 }
 
-/* Mobile adjustments */
 @media (max-width: 480px) {
     .box-login {
         padding: 30px 25px;

@@ -183,6 +183,59 @@
         #exit:hover{
             color: #ffb3b3;
         }
+
+        .history-panel{
+            display: none;
+            width: 100%;
+            margin-top: 6px;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(0,199,210,0.25);
+            border-radius: 12px;
+        }
+
+        .history-panel.open{
+            display: block;
+        }
+
+        .history-latest{
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+        }
+
+        .history-latest-label{
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+        }
+
+        .history-latest-value{
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--cyan-accent);
+        }
+
+        #history{
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        #history td{
+            color: white;
+            padding: 4px 2px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        #history tr:last-child td{
+            border-bottom: 0;
+        }
         .page-content{
             padding-top: 80px;
         }
@@ -204,10 +257,18 @@
                 <li><a class="nav-item" href="{{ url_for('views.home') }}">Home</a></li>
                 <li><a href="{{ url_for('views.about') }}">About</a></li>
                 <li><a class="back" id="logout">Logout</a></li>
-                <li><button class="back" id="recent" type="button">Recent</button></li>
-                <table id="history">
-                    <tr id="empty" ><small style="color: white;">No recent emissions</small></tr>
-                </table
+                <li><button class="back" id="recent" type="button" aria-expanded="false" aria-controls="history-panel">Recent</button></li>
+                <div id="history-panel" class="history-panel" aria-hidden="true">
+                    <div class="history-latest">
+                        <span class="history-latest-label">Latest total</span>
+                        <span class="history-latest-value" id="history-latest-value">—</span>
+                    </div>
+                    <table id="history">
+                        <tbody id="history-body">
+                            <tr id="empty"><td><small style="color: white;">No recent emissions</small></td></tr>
+                        </tbody>
+                    </table>
+                </div>
                 {%else%}
                 <li><a href="{{ url_for('auth.signup') }}">Sign up</a></li>
                 <li><a href="{{ url_for('auth.login') }}">Login</a></li>
@@ -225,12 +286,14 @@
 
         (function () {
             const menu   = document.getElementById("menu");
-            const back   = document.getElementById("back");
-            const exit   = document.getElementById("exit");
             const recent = document.getElementById("recent");
+            const historyPanel = document.getElementById("history-panel");
+            const historyBody  = document.getElementById("history-body");
+            const historyLatest = document.getElementById("history-latest-value");
             const nav    = document.getElementById("nav");
             const navBar = document.getElementById("nav-bar");
             const links  = nav.querySelectorAll("a");
+            let historyLoaded = false;
 
             function openMenu() {
                 navBar.classList.add("open");
@@ -251,7 +314,6 @@
             }
 
             menu.addEventListener("click", toggleMenu);
-            back.addEventListener("click", closeMenu);
             logout.addEventListener("click",()=>{
                 fetch("/auth/logout", {
                     method: "POST",
@@ -278,29 +340,67 @@
                 }
             });
 
-            // Highlight the current page's nav link
+            if (recent && historyPanel) {
+                recent.addEventListener("click", async () => {
+                    const isOpen = historyPanel.classList.contains("open");
+                    if (isOpen) {
+                        historyPanel.classList.remove("open");
+                        historyPanel.setAttribute("aria-hidden", "true");
+                        recent.setAttribute("aria-expanded", "false");
+                        return;
+                    }
+
+                    historyPanel.classList.add("open");
+                    historyPanel.setAttribute("aria-hidden", "false");
+                    recent.setAttribute("aria-expanded", "true");
+
+                    if (historyLoaded) return;
+
+                    try {
+                        const response = await fetch("/history");
+                        if (!response.ok) throw new Error("Failed to load history");
+                        const data = await response.json();
+                        const entries = Array.isArray(data.history) ? data.history : [];
+
+                        if (entries.length === 0) {
+                            historyLatest.textContent = "—";
+                            historyBody.innerHTML = '<tr id="empty"><td><small style="color: white;">No recent emissions</small></td></tr>';
+                            historyLoaded = true;
+                            return;
+                        }
+
+                        const latestTotalKg = (entries[0].search && entries[0].search.total_kg_co2e) || 0;
+                        historyLatest.textContent = (latestTotalKg / 1000).toFixed(2) + " t CO2e";
+
+                        historyBody.innerHTML = "";
+                        entries.slice(0, 5).forEach((entry) => {
+                            const totalKg = (entry.search && entry.search.total_kg_co2e) || 0;
+                            const date = entry.time ? new Date(entry.time).toLocaleDateString() : "N/A";
+                            const row = document.createElement("tr");
+                            row.innerHTML = `<td>${date}</td><td>${(totalKg / 1000).toFixed(2)} t</td>`;
+                            row.style.cursor = "pointer";
+                            row.addEventListener("click", () => {
+                                window.location.href = "{{ url_for('views.dashboard') }}#history-view";
+                            });
+                            historyBody.appendChild(row);
+                        });
+
+                        historyLoaded = true;
+                    } catch (error) {
+                        console.error("Error loading recent emissions:", error);
+                        historyBody.innerHTML = '<tr><td><small style="color: white;">Could not load recent emissions.</small></td></tr>';
+                    }
+                });
+            }
+
             const currentPath = window.location.pathname;
             links.forEach((link) => {
                 if (link.getAttribute("href") === currentPath) {
                     link.classList.add("active");
                 }
-                // Close the menu once a link is actually followed
                 link.addEventListener("click", closeMenu);
             });
 
-            // "Recent" remembers and jumps back to the last visited page
-            recent.addEventListener("click", () => {
-                const last = sessionStorage.getItem("lastPage");
-                if (last) {
-                    window.location.href = last;
-                } else {
-                    closeMenu();
-                }
-            });
-
-            window.addEventListener("beforeunload", () => {
-                sessionStorage.setItem("lastPage", window.location.href);
-            });
         })();
     </script>
 </body>

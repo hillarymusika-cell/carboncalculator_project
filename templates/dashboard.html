@@ -29,6 +29,32 @@
         border-bottom: 1px solid rgba(0, 157, 71, 0.25);
     }
 
+    .dash-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .view-toggle-btn,
+    .back-to-dashboard-btn {
+        background: rgba(0, 157, 71, 0.12);
+        border: 1px solid rgba(0, 157, 71, 0.35);
+        color: #7ae0a8;
+        border-radius: 40px;
+        padding: 8px 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .view-toggle-btn:hover,
+    .back-to-dashboard-btn:hover {
+        background: rgba(0, 157, 71, 0.22);
+        transform: translateY(-2px);
+    }
+
     .dash-header h1 {
         font-size: 2.2rem;
         font-weight: 700;
@@ -313,54 +339,60 @@
 
         <div class="dash-header">
             <h1>Carbon Dashboard</h1>
-            <div class="badge">
-                <span class="dot"></span>
-                Live &nbsp;·&nbsp; {{ now.strftime('%b %d, %Y') if now else 'Today' }}
+            <div class="dash-header-actions">
+                <div class="badge">
+                    <span class="dot"></span>
+                    Live &nbsp;·&nbsp; {{ now.strftime('%b %d, %Y') if now else 'Today' }}
+                </div>
+                <button type="button" id="view-toggle-btn" class="view-toggle-btn" data-mode="calc">
+                    📋 View History
+                </button>
             </div>
         </div>
-        <div class="stats-grid">
-            <div class="stat-card green">
-                <div class="label">⬇️ Total Footprint</div>
-                <div class="total-value"></div>
-                <div class="sub">t CO₂e / month</div>
+        <div id="calc-view">
+            <div class="stats-grid">
+                <div class="stat-card green">
+                    <div class="label">⬇️ Total Footprint</div>
+                    <div class="total-value"></div>
+                    <div class="sub">t CO₂e / month</div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="label">🚗 Transport</div>
+                    <div class="transport-value"></div>
+                    <div class="sub">t CO₂e</div>
+                </div>
+                <div class="stat-card blue">
+                    <div class="label">🏠 Housing</div>
+                    <div class="housing-value"></div>
+                    <div class="sub">t CO₂e</div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="label">⚡ Energy</div>
+                    <div class="energy-value"></div>
+                    <div class="sub">t CO₂e</div>
+                </div>
+                <div class="stat-card red">
+                    <div class="label">🌳 Offset</div>
+                    <div class="offset-value"></div>
+                    <div class="sub">t CO₂e</div>
+                </div>
             </div>
-            <div class="stat-card orange">
-                <div class="label">🚗 Transport</div>
-                <div class="transport-value"></div>
-                <div class="sub">t CO₂e · 39%</div>
-            </div>
-            <div class="stat-card blue">
-                <div class="label">🏠 Housing</div>
-                <div class="housing-value"></div>
-                <div class="sub">t CO₂e · 34%</div>
-            </div>
-            <div class="stat-card purple">
-                <div class="label">⚡ Energy</div>
-                <div class="energy-value"></div>
-                <div class="sub">t CO₂e · 27%</div>
-            </div>
-            <div class="stat-card red">
-                <div class="label">🌳 Offset</div>
-                <div class="offset-value"></div>
-                <div class="sub">t CO₂e · 11% reduced</div>
-            </div>
-        </div>
 
-        <!-- Charts -->
-        <div class="charts-row">
-            <div class="chart-box">
-                <h3>📊 Footprint by Category <span>— monthly</span></h3>
-                <canvas id="categoryChart" width="400" height="200"></canvas>
-            </div>
-            <div class="chart-box">
-                <h3>📈 Weekly Trend <span>— last 6 weeks</span></h3>
-                <canvas id="trendChart" width="400" height="200"></canvas>
+            <div class="charts-row">
+                <div class="chart-box">
+                    <h3>📊 Footprint by Category <span>— monthly</span></h3>
+                    <canvas id="categoryChart" width="400" height="200"></canvas>
+                </div>
+                <div class="chart-box">
+                    <h3>📈 Weekly Trend <span>— last 6 weeks</span></h3>
+                    <canvas id="trendChart" width="400" height="200"></canvas>
+                </div>
             </div>
         </div>
-        <div class="history-section">
+        <div class="history-section" id="history-view" style="display:none;">
             <div class="head">
                 <h3>📋 Recent Assessments</h3>
-                <a href="#">View all →</a>
+                <button type="button" id="back-to-dashboard-btn" class="back-to-dashboard-btn">← Back to Dashboard</button>
             </div>
             <div class="history-table-wrap">
                 <table class="history-table">
@@ -374,47 +406,8 @@
                             <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>2026-07-14</td>
-                            <td>Car</td>
-                            <td>2 adults · 1 child</td>
-                            <td>Electricity</td>
-                            <td>2.84</td>
-                            <td><span class="badge-status">Moderate</span></td>
-                        </tr>
-                        <tr>
-                            <td>2026-07-07</td>
-                            <td>Bus</td>
-                            <td>1 adult</td>
-                            <td>Gas</td>
-                            <td>3.12</td>
-                            <td><span class="badge-status high">High</span></td>
-                        </tr>
-                        <tr>
-                            <td>2026-06-30</td>
-                            <td>Bicycle</td>
-                            <td>2 adults · 2 children</td>
-                            <td>Wood</td>
-                            <td>4.01</td>
-                            <td><span class="badge-status high">High</span></td>
-                        </tr>
-                        <tr>
-                            <td>2026-06-23</td>
-                            <td>Electric Train</td>
-                            <td>1 adult · 1 pet</td>
-                            <td>Electricity</td>
-                            <td>1.95</td>
-                            <td><span class="badge-status">Low</span></td>
-                        </tr>
-                        <tr>
-                            <td>2026-06-16</td>
-                            <td>Motorcycle</td>
-                            <td>3 adults</td>
-                            <td>Charcoal</td>
-                            <td>3.78</td>
-                            <td><span class="badge-status medium">Medium</span></td>
-                        </tr>
+                    <tbody id="dashboard-history-body">
+                        <tr><td colspan="6" style="text-align:center; color:#7e96b5;">Loading history...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -428,7 +421,9 @@
 </script>
 
 <script>
-    // Initialize with latest data if available (server-side passed)
+    let categoryChartInstance = null;
+    let trendChartInstance = null;
+
     (function() {
         const dataElement = document.getElementById('latestData');
         if (dataElement) {
@@ -448,12 +443,9 @@
         
         const breakdown = result.breakdown;
         const total = result.total_kg_co2e || 0;
+        const totalTonnes = total / 1000;
+        setText('.total-value', totalTonnes.toFixed(2) + ' t');
         
-        // Convert kg to tonnes
-        const totalTonnes = (total / 1000).toFixed(2);
-        setText('.total-value', totalTonnes + ' t');
-        
-        // Extract values from breakdown
         const transport = (breakdown.Transport || 0) / 1000;
         const electricity = (breakdown.Electricity || 0) / 1000;
         const enhancedFuel = (breakdown.EnhancedFuel || 0) / 1000;
@@ -467,46 +459,10 @@
         setText('.offset-value', Math.abs(trees).toFixed(2) + ' t');
     }
     
-    function addHistoryRow(result) {
-        if (!result || !result.total_kg_co2e) return;
-        
-        const breakdown = result.breakdown || {};
-        const table = document.querySelector('.history-table tbody');
-        if (!table) return;
-        
-        const newRow = document.createElement('tr');
-        const now = new Date();
-        const dateStr = now.toISOString().split('T')[0];
-        
-        const transport = (breakdown.Transport || 0) / 1000;
-        const buildings = (breakdown.Buildings || 0) / 1000;
-        const energy = ((breakdown.Electricity || 0) + (breakdown.EnhancedFuel || 0)) / 1000;
-        const total = result.total_kg_co2e / 1000;
-        
-        let status = 'Low';
-        if (total > 3.5) status = 'High';
-        else if (total > 2.5) status = 'Medium';
-        
-        newRow.innerHTML = `
-            <td>${dateStr}</td>
-            <td>${transport.toFixed(2)} t</td>
-            <td>${buildings.toFixed(2)} t</td>
-            <td>${energy.toFixed(2)} t</td>
-            <td>${total.toFixed(2)} t</td>
-            <td><span class="badge-status ${status.toLowerCase()}">${status}</span></td>
-        `;
-        
-        table.insertBefore(newRow, table.firstChild);
-    }
-    
-    function showPage(page) {
-        // Hide all sections and show the requested one
-        const sections = document.querySelectorAll('section');
-        sections.forEach(s => s.style.display = 'none');
-        
-        if (page === 'dashboard') {
-            const dashboard = document.getElementById('dashboard');
-            if (dashboard) dashboard.style.display = 'block';
+    function setText(selector, value) {
+        const el = document.querySelector(selector);
+        if (el && value !== undefined && value !== null) {
+            el.textContent = value;
         }
     }
     
@@ -518,13 +474,11 @@
             const data = await response.json();
             if (!data.history || !Array.isArray(data.history)) return;
             
-            const table = document.querySelector('.history-table tbody');
+            const table = document.getElementById('dashboard-history-body');
             if (!table) return;
             
-            // Clear dummy rows
             table.innerHTML = '';
             
-            // Populate with real history
             let chartData = {
                 labels: [],
                 transport: [],
@@ -533,9 +487,9 @@
                 total: []
             };
             
-            data.history.forEach((entry, idx) => {
+            const entries = data.history.slice(0, 6);
+            entries.forEach((entry) => {
                 if (!entry.search) return;
-                
                 const breakdown = entry.search.breakdown || {};
                 const total = entry.search.total_kg_co2e || 0;
                 const transport = (breakdown.Transport || 0) / 1000;
@@ -543,24 +497,20 @@
                 const energy = ((breakdown.Electricity || 0) + (breakdown.EnhancedFuel || 0)) / 1000;
                 const totalTonnes = total / 1000;
                 
-                // Add to chart data (limit to 6 most recent)
-                if (idx < 6) {
-                    const date = entry.time ? new Date(entry.time).toLocaleDateString() : `Entry ${idx + 1}`;
-                    chartData.labels.unshift(date);
-                    chartData.transport.unshift(transport);
-                    chartData.housing.unshift(buildings);
-                    chartData.energy.unshift(energy);
-                    chartData.total.unshift(totalTonnes);
-                }
+                const date = entry.time ? new Date(entry.time).toLocaleDateString() : 'N/A';
+                chartData.labels.push(date);
+                chartData.transport.push(transport);
+                chartData.housing.push(buildings);
+                chartData.energy.push(energy);
+                chartData.total.push(totalTonnes);
                 
-                // Add to table
                 const row = document.createElement('tr');
                 let status = 'Low';
                 if (totalTonnes > 3.5) status = 'High';
                 else if (totalTonnes > 2.5) status = 'Medium';
                 
                 row.innerHTML = `
-                    <td>${entry.time ? new Date(entry.time).toLocaleDateString() : 'N/A'}</td>
+                    <td>${date}</td>
                     <td>${transport.toFixed(2)} t</td>
                     <td>${buildings.toFixed(2)} t</td>
                     <td>${energy.toFixed(2)} t</td>
@@ -570,26 +520,36 @@
                 table.appendChild(row);
             });
             
-            // Update charts with real data
+            if (entries.length === 0) {
+                table.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#7e96b5;">No entries yet. Submit the form to add one.</td></tr>';
+            }
+            
             updateCharts(chartData);
         } catch (error) {
             console.error('Error loading history:', error);
+            const table = document.getElementById('dashboard-history-body');
+            if (table) {
+                table.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#7e96b5;">Could not load history.</td></tr>';
+            }
         }
     }
     
     function updateCharts(data) {
-        // Update category chart
-        const categoryChart = Chart.helpers.get(document.getElementById('categoryChart'));
-        if (categoryChart) {
-            categoryChart.destroy();
+        const ctx1 = document.getElementById('categoryChart').getContext('2d');
+        const ctx2 = document.getElementById('trendChart').getContext('2d');
+        
+        if (categoryChartInstance) {
+            categoryChartInstance.destroy();
+        }
+        if (trendChartInstance) {
+            trendChartInstance.destroy();
         }
         
-        const ctx1 = document.getElementById('categoryChart').getContext('2d');
         const avgTransport = data.transport.length ? (data.transport.reduce((a, b) => a + b) / data.transport.length) : 0;
         const avgHousing = data.housing.length ? (data.housing.reduce((a, b) => a + b) / data.housing.length) : 0;
         const avgEnergy = data.energy.length ? (data.energy.reduce((a, b) => a + b) / data.energy.length) : 0;
         
-        new Chart(ctx1, {
+        categoryChartInstance = new Chart(ctx1, {
             type: 'doughnut',
             data: {
                 labels: ['Transport', 'Housing', 'Energy'],
@@ -620,14 +580,7 @@
             }
         });
         
-        // Update trend chart
-        const trendChart = Chart.helpers.get(document.getElementById('trendChart'));
-        if (trendChart) {
-            trendChart.destroy();
-        }
-        
-        const ctx2 = document.getElementById('trendChart').getContext('2d');
-        new Chart(ctx2, {
+        trendChartInstance = new Chart(ctx2, {
             type: 'line',
             data: {
                 labels: data.labels.slice(0, 6),
@@ -673,44 +626,48 @@
             }
         });
     }
-       
-       
-       function setText(selector, value) {
-       const el = document.querySelector(selector);
-        if (el && value !== undefined && value !== null) {
-        el.textContent = value;
-          }
-        }
-        
-       function formatEmission(value) {
-       if (value === undefined || value === null) return '0 kg CO₂e';
-       const num = Number(value);
-       return `${Number.isFinite(num) ? num.toFixed(2) : value} kg CO₂e`;
-       }
-       
-       async function deleteEntry(row) {
-         const entryId = row.dataset.entryId;
-         try {
-           if (entryId) {
-            const response = await fetch(`/entry/${entryId}`, { method: 'DELETE' });
-            if (!response.ok) throw new Error(`Server responded with ${response.status}`);
-        }
-        row.remove();
-
-        if (!historyBody.querySelector('tr')) {
-            const emptyRow = document.createElement('tr');
-            emptyRow.className = 'empty-row';
-            emptyRow.innerHTML = '<td colspan="8">No entries yet. Submit the form to add one.</td>';
-            historyBody.appendChild(emptyRow);
-        }
-    } catch (error) {
-        console.error(error);
-    }
- }
 
     document.addEventListener('DOMContentLoaded', function() {
-        // Load and display user's carbon footprint history
         loadHistory();
+
+        const calcView = document.getElementById('calc-view');
+        const historyView = document.getElementById('history-view');
+        const toggleBtn = document.getElementById('view-toggle-btn');
+        const backBtn = document.getElementById('back-to-dashboard-btn');
+
+        function showHistoryView() {
+            calcView.style.display = 'none';
+            historyView.style.display = 'block';
+            toggleBtn.dataset.mode = 'history';
+            toggleBtn.textContent = '📊 View Dashboard';
+            if (window.location.hash !== '#history-view') {
+                history.replaceState(null, '', '#history-view');
+            }
+        }
+
+        function showCalcView() {
+            historyView.style.display = 'none';
+            calcView.style.display = '';
+            toggleBtn.dataset.mode = 'calc';
+            toggleBtn.textContent = '📋 View History';
+            if (window.location.hash) {
+                history.replaceState(null, '', window.location.pathname);
+            }
+        }
+
+        toggleBtn.addEventListener('click', function() {
+            if (toggleBtn.dataset.mode === 'history') {
+                showCalcView();
+            } else {
+                showHistoryView();
+            }
+        });
+
+        backBtn.addEventListener('click', showCalcView);
+
+        if (window.location.hash === '#history-view') {
+            showHistoryView();
+        }
     });
 </script>
 {% endblock %}

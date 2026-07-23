@@ -78,7 +78,7 @@
         background: #f8f9fa;
         min-height: 100dvh;
         transition: ease 0.4s;
-        display:block;
+        display: none;
     }
 
     .form-container {
@@ -189,6 +189,10 @@
         background: #007466;
         width:90px;
     }
+    #submit-btn.loading {
+        opacity: 0.6;
+        pointer-events: none;
+    }
 </style>
 {% endblock %}
 
@@ -210,13 +214,13 @@
 
 <section id="entry">
     <div class="form-container">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <h2>Carbon Footprint Assessment</h2>
         <p>Fill in the following information to continue</p>
 
         <form id="carbon-form" action="/submit" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
             
-            <!-- Transport Step -->
             <div class="section step active" id="step-transport">
                 <h3>Transportation</h3>
                 
@@ -271,32 +275,30 @@
                 </div>
             </div>
 
-            <!-- Housing Step -->
             <div class="section step" id="step-housing">
                 <h3>Housing</h3>
                 <div class="form-row">
                     <label for="house_no">Number of houses:</label>
-                    <input type="number" name="house_no" id="house_no" min="0">
+                    <input type="number" name="house_no" id="house_no" min="0" value="0">
                 </div>
                 <div class="form-row">
                     <label for="adults">Number of adults:</label>
-                    <input type="number" name="adults" id="adults" min="0">
+                    <input type="number" name="adults" id="adults" min="0" value="0">
                 </div>
                 <div class="form-row">
                     <label for="livestock">Number of livestock:</label>
-                    <input type="number" name="livestock" id="livestock" min="0">
+                    <input type="number" name="livestock" id="livestock" min="0" value="0">
                 </div>
                 <div class="form-row">
                     <label for="pets">Number of pets:</label>
-                    <input type="number" name="pets" id="pets" min="0">
+                    <input type="number" name="pets" id="pets" min="0" value="0">
                 </div>
                 <div class="form-row">
                     <label for="trees">Number of trees on property:</label>
-                    <input type="number" name="trees" id="trees" min="0">
+                    <input type="number" name="trees" id="trees" min="0" value="0">
                 </div>
             </div>
 
-            <!-- Energy Step -->
             <div class="section step" id="step-energy">
                 <h3>Domestic Energy Source</h3>
                 <div class="radio-group">
@@ -311,7 +313,7 @@
                 <div style="margin-top: 2rem;">
                     <label>Estimated monthly energy expense</label>
                     <div class="form-row">
-                        <input type="number" name="energy_expense" placeholder="Amount in local currency">
+                        <input type="number" name="energy_expense" placeholder="Amount in local currency" value="0">
                     </div>
                 </div>
             </div>
@@ -344,6 +346,8 @@
     submitBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         const form = document.getElementById('carbon-form');
+        submitBtn.classList.add('loading');
+        submitBtn.textContent = 'Sending...';
         try {
             const response = await fetch('/submit', {
                 method: 'POST',
@@ -354,12 +358,13 @@
                 throw new Error(`Server responded with ${response.status}`);
             }
             const result = await response.json();
-            console.log('Submission successful:', result);
-            // Redirect to dashboard to display results
             window.location.href = '/dashboard';
         } catch (error) {
             console.error('Error:', error);
             alert('Something went wrong submitting your entry. Please try again.');
+        } finally {
+            submitBtn.classList.remove('loading');
+            submitBtn.textContent = 'Submit';
         }
     });
     nextBtn.addEventListener('click', () => {
@@ -399,7 +404,6 @@
         entry.scrollIntoView({ behavior: 'smooth' });
     });
 
-    // Initial state
     showStep(0);
 </script>
 {% endblock %}

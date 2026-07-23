@@ -53,7 +53,6 @@
     border-color: rgba(0, 157, 71, 0.15);
 }
 
-/* Custom scrollbar for modern browsers */
 .dash-container::-webkit-scrollbar {
     width: 6px;
     height: 6px;
