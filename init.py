@@ -34,7 +34,7 @@ def create_app():
         secret_key = os.urandom(24).hex()
     app.config["SECRET_KEY"] = secret_key
 
-    db_path = os.path.join(BASE_DIR, "stance", DATABASE_NAME)
+    db_path = os.path.join(BASE_DIR, "instance", DATABASE_NAME)
     app.config["SESSION_COOKIE_SECURE"] = True
     app.config["SESSION_COOKIE_HTTPONLY"] = True
     app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
