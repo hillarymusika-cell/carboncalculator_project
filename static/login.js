@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       alert(data.message || "Signed in successfully.");
-      window.location.href = homeUrl;
+      window.location.href = data.redirect || homeUrl;
     } catch (err) {
       alert("Could not reach the server. Please check your connection and try again.");
     } finally {
@@ -51,6 +51,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   googleBtn.addEventListener("click", () => {
-    window.location.href = "{{ url_for('auth.google_login') }}";
+    window.location.href = "/auth/google";
   });
 });

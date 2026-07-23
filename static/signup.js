@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       alert(data.message || "Account created successfully.");
-      window.location.href =data.redirect|| homeUrl;
+      window.location.href = data.redirect || homeUrl;
     } catch (err) {
       alert("Could not reach the server. Please check your connection and try again.");
     } finally {
@@ -71,6 +71,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   googleBtn.addEventListener("click", () => {
-    alert("Google sign-in isn't set up yet.");
+    window.location.href = "/auth/google";
   });
 });
