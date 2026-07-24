@@ -51,7 +51,39 @@ def create_app():
 
     db.init_app(app)
     csrf.init_app(app)
+
+    # --- Google OAuth setup ---
+    # Registered here (once) on the shared `oauth` instance so that every
+    # module that does `from init import oauth` gets the same, fully
+    # configured client. Previously auth.py created a second, separate
+    # OAuth() instance and registered "google" on that one instead — the
+    # instance actually wired into the Flask app via init_app() never had
+    # a google client at all.
     oauth.init_app(app)
+
+    google_client_id = os.environ.get("GOOGLE_CLIENT_ID")
+    google_client_secret = os.environ.get("GOOGLE_CLIENT_SECRET")
+
+    if not google_client_id or not google_client_secret:
+        if os.environ.get("FLASK_ENV") == "production":
+            raise RuntimeError(
+                "GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment "
+                "variables must be set in production."
+            )
+        print(
+            "WARNING: GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET are not set. "
+            "Google sign-in will fail with 'invalid_client' until these "
+            "are configured."
+        )
+
+    oauth.register(
+        name="google",
+        client_id=google_client_id,
+        client_secret=google_client_secret,
+        server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+        client_kwargs={"scope": "openid email profile"},
+    )
+
     login_manager = LoginManager()
     login_manager.login_view = "auth.login"
     login_manager.init_app(app)
