@@ -29,60 +29,14 @@
         const buildings = (breakdown.Buildings || 0) / 1000;
         const trees = (breakdown.Trees || 0) / 1000;
         const household = ((breakdown.Adults || 0) + (breakdown.Livestock || 0) + (breakdown.Pets || 0)) / 1000;
-        const energy = electricity + enhancedFuel;
         
         setText('.transport-value', transport.toFixed(2) + ' t');
         setText('.housing-value', buildings.toFixed(2) + ' t');
-        setText('.energy-value', energy.toFixed(2) + ' t');
+        setText('.energy-value', (electricity + enhancedFuel).toFixed(2) + ' t');
         setText('.household-value', household.toFixed(2) + ' t');
         setText('.offset-value', Math.abs(trees).toFixed(2) + ' t');
-        
-        // Keep the donut in sync with these exact same numbers, rather than
-        // letting a later history-average overwrite it with stale/mismatched data.
-        renderCategoryChart(transport, buildings, energy, household);
     }
     
-    function renderCategoryChart(transport, housing, energy, household) {
-        const canvas = document.getElementById('categoryChart');
-        if (!canvas) return;
-        const ctx1 = canvas.getContext('2d');
-
-        if (categoryChartInstance) {
-            categoryChartInstance.destroy();
-        }
-
-        categoryChartInstance = new Chart(ctx1, {
-            type: 'doughnut',
-            data: {
-                labels: ['Transport', 'Housing', 'Energy', 'Household'],
-                datasets: [{
-                    data: [transport, housing, energy, household],
-                    backgroundColor: ['#f5a623', '#4aa3ff', '#b388ff', '#ffd93d'],
-                    borderColor: ['#0b0e14', '#0b0e14', '#0b0e14', '#0b0e14'],
-                    borderWidth: 3,
-                    hoverOffset: 8
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                cutout: '64%',
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            color: '#c8d6e8',
-                            font: { size: 12, weight: '500' },
-                            padding: 16,
-                            usePointStyle: true,
-                            pointStyle: 'circle'
-                        }
-                    }
-                }
-            }
-        });
-    }
-
     function setText(selector, value) {
         const el = document.querySelector(selector);
         if (el && value !== undefined && value !== null) {
@@ -163,11 +117,51 @@
     }
     
     function updateCharts(data) {
+        const ctx1 = document.getElementById('categoryChart').getContext('2d');
         const ctx2 = document.getElementById('trendChart').getContext('2d');
         
+        if (categoryChartInstance) {
+            categoryChartInstance.destroy();
+        }
         if (trendChartInstance) {
             trendChartInstance.destroy();
         }
+        
+        const avgTransport = data.transport.length ? (data.transport.reduce((a, b) => a + b) / data.transport.length) : 0;
+        const avgHousing = data.housing.length ? (data.housing.reduce((a, b) => a + b) / data.housing.length) : 0;
+        const avgEnergy = data.energy.length ? (data.energy.reduce((a, b) => a + b) / data.energy.length) : 0;
+        const avgHousehold = data.household.length ? (data.household.reduce((a, b) => a + b) / data.household.length) : 0;
+        
+        categoryChartInstance = new Chart(ctx1, {
+            type: 'doughnut',
+            data: {
+                labels: ['Transport', 'Housing', 'Energy', 'Household'],
+                datasets: [{
+                    data: [avgTransport, avgHousing, avgEnergy, avgHousehold],
+                    backgroundColor: ['#f5a623', '#4aa3ff', '#b388ff', '#ffd93d'],
+                    borderColor: ['#0b0e14', '#0b0e14', '#0b0e14', '#0b0e14'],
+                    borderWidth: 3,
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                cutout: '64%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#c8d6e8',
+                            font: { size: 12, weight: '500' },
+                            padding: 16,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    }
+                }
+            }
+        });
         
         trendChartInstance = new Chart(ctx2, {
             type: 'line',
