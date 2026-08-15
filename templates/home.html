@@ -1,409 +1,178 @@
 {% extends "base.html" %}
-{% block title %}Home Page{% endblock %}
+{% block title %}Home · Cosmic Carbon Calculator{% endblock %}
 
 {% block style %}
-<link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}" type="text/css" media="all" />
-<style>
-    #home {
-        text-align: center;
-        background-image: url("{{ url_for('static', filename='home.png') }}");
-        background-repeat: no-repeat;
-        background-size: cover;
-        background-position: center;
-        color: white;
-        min-height: 100dvh;
-        font-family: Georgia, serif;
-        padding: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .home-container {
-        border: 1px solid rgba(255,255,255,0.3);
-        border-radius: 20px;
-        max-width: 800px;
-        width: 100%;
-        padding: 60px 40px;
-        backdrop-filter: blur(16px);
-        background:transparent ;
-        box-shadow: 0 10px 30px #009D47;
-        display: flex;
-        flex-direction: column;
-        gap: 2rem;
-    }
-
-    .title {
-        font-size: 3.5rem;
-        margin: 0;
-        text-shadow: 0 4px 8px rgba(0,0,0,0.6);
-    }
-
-    .text p {
-        font-size: 1.4rem;
-        max-width: 600px;
-        margin: 1.5rem auto;
-    }
-
-    .button-container {
-        margin-top: 2rem;
-    }
-
-    .button-container button {
-        height: 70px;
-        width: 100%;
-        max-width: 320px;
-        margin: 0 auto;
-        color: white;
-        font-family: 'Segoe UI', sans-serif;
-        font-size: 1.8rem;
-        font-weight: 600;
-        background: transparent;
-        border: 3px solid #502B00;
-        border-radius: 50px;
-        box-shadow: 0 8px 16px rgba(191, 168, 128, 0.4);
-        transition: all 0.4s ease;
-        cursor: pointer;
-    }
-
-    .button-container button:hover {
-        background: #381F00;
-        transform: translateY(-4px);
-        box-shadow: 0 12px 24px rgba(191, 168, 128, 0.6);
-        color: #ddd;
-    }
-
-    #entry {
-        padding: 40px 20px;
-        background: #f8f9fa;
-        min-height: 100dvh;
-        transition: ease 0.4s;
-        display: none;
-    }
-
-    .form-container {
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 40px;
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    }
-
-    .form-container h2, .form-container p {
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-
-    .section {
-        margin-bottom: 3rem;
-        padding: 1.5rem;
-        border: 1px solid #eee;
-        border-radius: 12px;
-        background: #fafafa;
-    }
-
-    .section h3 {
-        margin-bottom: 1rem;
-        color: #333;
-        border-bottom: 2px solid #008EEC;
-        padding-bottom: 0.5rem;
-    }
-
-    .radio-group {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1.2rem;
-        margin: 1rem 0;
-    }
-
-    .radio-group label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-weight: 500;
-        cursor: pointer;
-    }
-
-    input[type="radio"] {
-        accent-color: #008EEC;
-    }
-
-    .other-container {
-        margin-top: 1rem;
-    }
-
-    .form-row {
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-        margin-bottom: 1rem;
-        flex-wrap: wrap;
-    }
-
-    input[type="number"], input[type="text"], select {
-        padding: 10px 14px;
-        border: 2px solid #ddd;
-        border-radius: 8px;
-        font-size: 1rem;
-        transition: border 0.3s;
-    }
-
-    input[type="number"]:focus, input[type="text"]:focus, select:focus {
-        border-color: #008EEC;
-        outline: none;
-    }
-
-    label {
-        font-weight: 500;
-        min-width: 140px;
-    }
-
-    .step {
-        display: none;
-    }
-
-    .step.active {
-        display: block;
-    }
-
-    .nav-buttons {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 2rem;
-    }
-    #prev-btn,#next-btn,#submit-btn{
-        height: 40px;
-        width: 100px;
-        font-size: 20px;
-        outline: none;
-        border: 0;
-        border-radius:16px;
-        font-weight:400px;
-        background: #008E85;
-        color: white;
-        transition:transform 0.4s ease;
-    }
-    #prev-btn:hover,#next-btn:hover,#submit-btn:hover{
-        transform: translateY(5px);
-        background: #007466;
-        width:90px;
-    }
-    #submit-btn.loading {
-        opacity: 0.6;
-        pointer-events: none;
-    }
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
 {% endblock %}
 
 {% block content %}
 <section id="home">
     <div class="home-container">
-        <h1 class="title">Cosmic Carbon Calculator</h1>
-        <small>Legacy through open system integration</small>
-        
-        <div class="text">
-            <p>Changing generations through fighting carbon consumption</p>
-        </div>
-        
-        <div class="button-container">
-            <button id="continue">Continue</button>
-        </div>
+        <div class="badge">🌍 Footprint tracker</div>
+        <h1 class="title">Cosmic <span>Carbon</span> Calculator</h1>
+        <p class="lead">Understand your emissions from transport, energy, and home — then track progress over time.</p>
+        <button type="button" id="continue">Start assessment</button>
     </div>
 </section>
 
-<section id="entry">
+<section id="entry" aria-labelledby="form-title">
     <div class="form-container">
-        <h2>Carbon Footprint Assessment</h2>
-        <p>Fill in the following information to continue</p>
+        <div class="form-header">
+            <h2 id="form-title">Carbon Footprint Assessment</h2>
+            <p>Answer a few questions — takes about 2 minutes</p>
+        </div>
 
-        <form id="carbon-form" action="/submit" method="POST">
+        <div class="progress" role="progressbar" aria-valuemin="1" aria-valuemax="3" aria-valuenow="1" id="progress-bar">
+            <div class="progress-step active" data-step="0"></div>
+            <div class="progress-step" data-step="1"></div>
+            <div class="progress-step" data-step="2"></div>
+        </div>
+        <div class="progress-labels">
+            <span class="active" data-label="0">Transport</span>
+            <span data-label="1">Housing</span>
+            <span data-label="2">Energy</span>
+        </div>
+
+        <form id="carbon-form" action="/submit" method="POST" novalidate>
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
-            
-            <div class="section step active" id="step-transport">
-                <h3>Transportation</h3>
-                
-                <div class="radio-group">
-                    <div>
+            <div class="section step active" id="step-transport" data-step="0">
+                <h3>🚗 Transportation</h3>
+                <div class="radio-group" role="radiogroup" aria-label="Primary transport mode">
+                    <div class="radio-card">
                         <input type="radio" id="car" name="transport" value="car">
                         <label for="car">Car</label>
                     </div>
-                    <div>
+                    <div class="radio-card">
                         <input type="radio" id="bus" name="transport" value="bus">
                         <label for="bus">Bus</label>
                     </div>
-                    <div>
+                    <div class="radio-card">
                         <input type="radio" id="motor-cycle" name="transport" value="motorcycle">
                         <label for="motor-cycle">Motorcycle</label>
                     </div>
-                    <div>
+                    <div class="radio-card">
                         <input type="radio" id="electric-train" name="transport" value="electric-train">
-                        <label for="electric-train">Electric Train</label>
+                        <label for="electric-train">Electric train</label>
                     </div>
-                    <div>
+                    <div class="radio-card">
                         <input type="radio" id="thermo-train" name="transport" value="thermo-train">
-                        <label for="thermo-train">Thermo Train</label>
+                        <label for="thermo-train">Thermo train</label>
                     </div>
-                    <div>
+                    <div class="radio-card">
                         <input type="radio" id="bicycle" name="transport" value="bicycle">
                         <label for="bicycle">Bicycle</label>
                     </div>
-                    <div>
+                    <div class="radio-card">
                         <input type="radio" id="other-transport" name="transport" value="other">
                         <label for="other-transport">Other</label>
                     </div>
                 </div>
 
-                <div class="other-container" id="other-transport-container" style="display:none;">
-                    <label for="othermeans">Specify other means of transport:</label>
-                    <input type="text" id="othermeans" name="other_transport" placeholder="e.g. Walking, Scooter...">
+                <div class="other-container" id="other-transport-container">
+                    <label for="othermeans">Specify other means</label>
+                    <input type="text" id="othermeans" name="other_transport" placeholder="e.g. Walking, scooter…">
                 </div>
 
-                <div style="margin-top: 2rem;">
-                    <label>How often do you use this transport per week?</label>
-                    <div class="radio-group">
-                        <div><input type="radio" name="frequency" value="1"> <label>Once</label></div>
-                        <div><input type="radio" name="frequency" value="2"> <label>Twice</label></div>
-                        <div><input type="radio" name="frequency" value="3"> <label>Thrice</label></div>
-                        <div>
+                <div style="margin-top: 1.5rem;">
+                    <p style="font-weight:600; margin:0 0 10px; color:var(--teal-base);">How often do you use this per week?</p>
+                    <div class="radio-group" role="radiogroup" aria-label="Weekly frequency">
+                        <div class="radio-card">
+                            <input type="radio" name="frequency" value="1" id="freq-1">
+                            <label for="freq-1">Once</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="frequency" value="2" id="freq-2">
+                            <label for="freq-2">Twice</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="frequency" value="3" id="freq-3">
+                            <label for="freq-3">Thrice</label>
+                        </div>
+                        <div class="radio-card">
                             <input type="radio" name="frequency" value="multiple" id="freq-multiple">
                             <label for="freq-multiple">Multiple</label>
                         </div>
                     </div>
-                    <input type="number" id="multi-frequency" name="frequency_custom" placeholder="Times per week" style="display:none; width:200px;" min="1">
+                    <div class="freq-custom" id="freq-custom-wrap">
+                        <label for="multi-frequency">Times per week</label>
+                        <input type="number" id="multi-frequency" name="frequency_custom" placeholder="e.g. 5" min="1" max="50">
+                    </div>
                 </div>
             </div>
 
-            <div class="section step" id="step-housing">
-                <h3>Housing</h3>
+            <div class="section step" id="step-housing" data-step="1">
+                <h3>🏠 Housing &amp; household</h3>
                 <div class="form-row">
-                    <label for="house_no">Number of houses:</label>
-                    <input type="number" name="house_no" id="house_no" min="0" value="0">
+                    <label for="house_no">Number of houses</label>
+                    <input type="number" name="house_no" id="house_no" min="0" value="1">
                 </div>
                 <div class="form-row">
-                    <label for="adults">Number of adults:</label>
-                    <input type="number" name="adults" id="adults" min="0" value="0">
+                    <label for="adults">Number of adults</label>
+                    <input type="number" name="adults" id="adults" min="0" value="1">
                 </div>
                 <div class="form-row">
-                    <label for="livestock">Number of livestock:</label>
+                    <label for="livestock">Number of livestock</label>
                     <input type="number" name="livestock" id="livestock" min="0" value="0">
+                    <p class="field-hint">Cattle, goats, chickens, etc.</p>
                 </div>
                 <div class="form-row">
-                    <label for="pets">Number of pets:</label>
+                    <label for="pets">Number of pets</label>
                     <input type="number" name="pets" id="pets" min="0" value="0">
                 </div>
                 <div class="form-row">
-                    <label for="trees">Number of trees on property:</label>
+                    <label for="trees">Trees on property</label>
                     <input type="number" name="trees" id="trees" min="0" value="0">
+                    <p class="field-hint">Trees act as a carbon offset</p>
                 </div>
             </div>
 
-            <div class="section step" id="step-energy">
-                <h3>Domestic Energy Source</h3>
-                <div class="radio-group">
-                    <div><input type="radio" name="fuel" id="gas" value="gas"><label for="gas">Gas</label></div>
-                    <div><input type="radio" name="fuel" id="petro" value="petroleum"><label for="petro">Petroleum</label></div>
-                    <div><input type="radio" name="fuel" id="coal" value="coal"><label for="coal">Coal</label></div>
-                    <div><input type="radio" name="fuel" id="charcoal" value="charcoal"><label for="charcoal">Charcoal</label></div>
-                    <div><input type="radio" name="fuel" id="electricity" value="electricity"><label for="electricity">Electricity</label></div>
-                    <div><input type="radio" name="fuel" id="wood" value="wood"><label for="wood">Firewood</label></div>
+            <div class="section step" id="step-energy" data-step="2">
+                <h3>⚡ Domestic energy source</h3>
+                <div class="radio-group" role="radiogroup" aria-label="Primary fuel / energy">
+                    <div class="radio-card">
+                        <input type="radio" name="fuel" id="gas" value="gas">
+                        <label for="gas">Gas</label>
+                    </div>
+                    <div class="radio-card">
+                        <input type="radio" name="fuel" id="petro" value="petroleum">
+                        <label for="petro">Petroleum</label>
+                    </div>
+                    <div class="radio-card">
+                        <input type="radio" name="fuel" id="coal" value="coal">
+                        <label for="coal">Coal</label>
+                    </div>
+                    <div class="radio-card">
+                        <input type="radio" name="fuel" id="charcoal" value="charcoal">
+                        <label for="charcoal">Charcoal</label>
+                    </div>
+                    <div class="radio-card">
+                        <input type="radio" name="fuel" id="electricity" value="electricity">
+                        <label for="electricity">Electricity</label>
+                    </div>
+                    <div class="radio-card">
+                        <input type="radio" name="fuel" id="wood" value="wood">
+                        <label for="wood">Firewood</label>
+                    </div>
                 </div>
 
-                <div style="margin-top: 2rem;">
-                    <label>Estimated monthly energy expense</label>
-                    <div class="form-row">
-                        <input type="number" name="energy_expense" placeholder="Amount in local currency" value="0">
-                    </div>
+                <div class="form-row" style="margin-top: 1.25rem;">
+                    <label for="energy_expense">Estimated monthly energy expense</label>
+                    <input type="number" name="energy_expense" id="energy_expense" placeholder="Amount in local currency" value="0" min="0">
+                    <p class="field-hint">Used to scale energy-related emissions</p>
                 </div>
             </div>
 
             <div class="nav-buttons">
                 <button type="button" id="prev-btn" style="display:none;">Previous</button>
                 <button type="button" id="next-btn">Next</button>
-                <button type="submit" id="submit-btn" style="display:none; background:#008EEC; color:white;">Submit</button>
+                <button type="submit" id="submit-btn" style="display:none;">Submit</button>
             </div>
         </form>
     </div>
 </section>
+{% endblock %}
 
-<script>
-    let currentStep = 0;
-    const steps = document.querySelectorAll('.step');
-    const nextBtn = document.getElementById('next-btn');
-    const prevBtn = document.getElementById('prev-btn');
-    const submitBtn = document.getElementById('submit-btn');
-
-    function showStep(n) {
-        steps.forEach((step, i) => {
-            step.classList.toggle('active', i === n);
-        });
-        
-        prevBtn.style.display = n > 0 ? 'block' : 'none';
-        nextBtn.style.display = n < steps.length - 1 ? 'block' : 'none';
-        submitBtn.style.display = n === steps.length - 1 ? 'block' : 'none';
-    }
-    submitBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        const form = document.getElementById('carbon-form');
-        submitBtn.classList.add('loading');
-        submitBtn.textContent = 'Sending...';
-        try {
-            const response = await fetch('/submit', {
-                method: 'POST',
-                body: new FormData(form)
-            });
-
-            if (!response.ok) {
-                throw new Error(`Server responded with ${response.status}`);
-            }
-            const result = await response.json();
-            window.location.href = '/dashboard';
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Something went wrong submitting your entry. Please try again.');
-        } finally {
-            submitBtn.classList.remove('loading');
-            submitBtn.textContent = 'Submit';
-        }
-    });
-    nextBtn.addEventListener('click', () => {
-        if (currentStep < steps.length - 1) {
-            currentStep++;
-            showStep(currentStep);
-        }
-    });
-
-    prevBtn.addEventListener('click', () => {
-        if (currentStep > 0) {
-            currentStep--;
-            showStep(currentStep);
-        }
-    });
-
-    const otherRadio = document.getElementById('other-transport');
-    const otherContainer = document.getElementById('other-transport-container');
-    
-    document.querySelectorAll('input[name="transport"]').forEach(radio => {
-        radio.addEventListener('change', () => {
-            otherContainer.style.display = otherRadio.checked ? 'block' : 'none';
-        });
-    });
-    
-    const freqMultiple = document.getElementById('freq-multiple');
-    const multiFreqInput = document.getElementById('multi-frequency');
-    
-    freqMultiple.addEventListener('change', () => {
-        multiFreqInput.style.display = freqMultiple.checked ? 'block' : 'none';
-    });
-
-    document.getElementById('continue').addEventListener('click', () => {
-        document.getElementById('home').style.display = 'none';
-        const entry=document.getElementById('entry');
-        entry.style.display="block";
-        entry.scrollIntoView({ behavior: 'smooth' });
-    });
-
-    showStep(0);
-</script>
+{% block script %}
+<script src="{{ url_for('static', filename='home.js') }}"></script>
 {% endblock %}
