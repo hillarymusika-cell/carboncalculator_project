@@ -7,13 +7,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const toggleBtn = document.getElementById("toggle-password");
   const toggleIcon = document.getElementById("toggle-password-icon");
 
-  toggleBtn.addEventListener("click", () => {
-    const showing = passwordInput.type === "text";
-    passwordInput.type = showing ? "password" : "text";
-    toggleIcon.classList.toggle("fa-eye", showing);
-    toggleIcon.classList.toggle("fa-eye-slash", !showing);
-    toggleBtn.setAttribute("aria-label", showing ? "Show password" : "Hide password");
-  });
+  if (toggleBtn && passwordInput) {
+    toggleBtn.addEventListener("click", () => {
+      const showing = passwordInput.type === "text";
+      passwordInput.type = showing ? "password" : "text";
+      toggleIcon.classList.toggle("fa-eye", showing);
+      toggleIcon.classList.toggle("fa-eye-slash", !showing);
+      toggleBtn.setAttribute("aria-label", showing ? "Show password" : "Hide password");
+    });
+  }
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -40,7 +42,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      alert(data.message || "Signed in successfully.");
       window.location.href = data.redirect || homeUrl;
     } catch (err) {
       alert("Could not reach the server. Please check your connection and try again.");
@@ -50,7 +51,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  googleBtn.addEventListener("click", () => {
-    window.location.href = "/auth/google";
-  });
+  if (googleBtn) {
+    googleBtn.addEventListener("click", () => {
+      window.location.href = "/auth/google";
+    });
+  }
 });
