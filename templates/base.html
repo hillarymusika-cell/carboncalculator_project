@@ -3,261 +3,34 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>{% block title %}base template{% endblock %}</title>
-    <meta name="description" content="">
+    <title>{% block title %}Cosmic Carbon Calculator{% endblock %}</title>
+    <meta name="description" content="Estimate and track your carbon footprint">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
     {% block style %}{% endblock %}
-
-    <style>
-        :root{
-            --teal-deep: #003C3D;
-            --teal-base: #004E4F;
-            --teal-light: #007E69;
-            --cyan-accent: #00C7D2;
-            --cyan-glow: #00D0C6;
-            --ink: #0A1F1F;
-            --paper: #F7FAF9;
-            --muted: #9FB8B6;
-        }
-
-        *{
-            box-sizing: border-box;
-        }
-
-        body{
-            margin: 0;
-            text-align: center;
-            color: var(--ink);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-            font-size: 14px;
-            background: var(--paper);
-        }
-
-        li{
-            margin: 4px 0;
-            list-style: none;
-        }
-        .nav-bar{
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 64px;
-            overflow: hidden;
-            background: linear-gradient(160deg, var(--teal-deep), var(--teal-base));
-            padding: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.25);
-            transition: height 0.35s cubic-bezier(0.4,0,0.2,1);
-        }
-
-        .nav-bar.open{
-            height: 100vh;
-        }
-
-        .nav-section{
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .menu{
-            margin: 12px;
-            background: transparent;
-            border: 0;
-            outline: none;
-            width: 44px;
-            height: 44px;
-            color: white;
-            border-radius: 10px;
-            font-size: 1.6rem;
-            cursor: pointer;
-            align-self: flex-start;
-            flex-shrink: 0;
-            transition: background 0.2s ease, transform 0.2s ease;
-        }
-
-        .menu:hover{
-            background: rgba(255,255,255,0.08);
-            transform: scale(1.05);
-        }
-
-        .menu:focus-visible,
-        .back:focus-visible,
-        .nav a:focus-visible{
-            outline: 2px solid var(--cyan-accent);
-            outline-offset: 2px;
-        }
-
-        .nav{
-            margin: 0;
-            padding: 0 24px 24px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 4px;
-            opacity: 0;
-            transform: translateY(-8px);
-            transition: opacity 0.3s ease 0.1s, transform 0.3s ease 0.1s;
-            overflow-y: auto;
-        }
-
-        .nav-bar.open .nav{
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .profile{
-            border-radius: 50%;
-            height: 44px;
-            width: 44px;
-            border: solid var(--cyan-accent) 2px;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 16px;
-            margin: 8px 0 20px;
-        }
-
-        .profile_logo{
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: solid var(--teal-light) 1px;
-            border-radius: 50%;
-            height: 100%;
-            width: 100%;
-            box-shadow: 0 0 10px var(--cyan-glow);
-        }
-
-        .nav a{
-            text-decoration: none;
-            color: white;
-            font-size: 1.3rem;
-            font-weight: 500;
-            padding: 6px 10px;
-            border-radius: 8px;
-            width: 100%;
-            text-align: left;
-            transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
-        }
-
-        .nav a:hover,
-        .nav a.active{
-            color: var(--cyan-accent);
-            background: rgba(255,255,255,0.06);
-            transform: translateX(6px);
-        }
-
-        .nav a.active{
-            border-left: 3px solid var(--cyan-accent);
-        }
-
-        .back{
-            background: transparent;
-            border: 0;
-            outline: none;
-            width: 100%;
-            text-align: left;
-            color: white;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            padding: 8px 10px;
-            cursor: pointer;
-            transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
-        }
-
-        .back:hover{
-            color: var(--cyan-accent);
-            background: rgba(255,255,255,0.06);
-            transform: translateX(6px);
-        }
-
-        #exit{
-            margin-top: auto;
-            color: #ff8a8a;
-        }
-
-        #exit:hover{
-            color: #ffb3b3;
-        }
-
-        .history-panel{
-            display: none;
-            width: 100%;
-            margin-top: 6px;
-            padding: 12px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(0,199,210,0.25);
-            border-radius: 12px;
-        }
-
-        .history-panel.open{
-            display: block;
-        }
-
-        .history-latest{
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            padding-bottom: 8px;
-            margin-bottom: 8px;
-            border-bottom: 1px solid rgba(255,255,255,0.12);
-        }
-
-        .history-latest-label{
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--muted);
-        }
-
-        .history-latest-value{
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--cyan-accent);
-        }
-
-        #history{
-            width: 50%;
-            border-collapse: collapse;
-            font-size: 0.8rem;
-        }
-
-        #history td{
-            color: white;
-            padding: 2px 2px;
-            text-align: left;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-        }
-
-        #history tr:last-child td{
-            border-bottom: 0;
-        }
-        .page-content{
-            padding-top: 80px;
-        }
-    </style>
 </head>
 <body id="body">
 
-    <div class="nav-bar" id="nav-bar">
+    <header class="nav-bar" id="nav-bar">
         <div class="nav-section">
-            <button class="menu" id="menu" aria-label="Open menu" aria-expanded="false">&#9776;</button>
+            <div class="nav-top">
+                <button class="menu" id="menu" aria-label="Open menu" aria-expanded="false" aria-controls="nav">&#9776;</button>
+                <a class="brand" href="{% if user.is_authenticated %}{{ url_for('views.home') }}{% else %}{{ url_for('auth.login') }}{% endif %}">
+                    Cosmic <span>Carbon</span>
+                </a>
+            </div>
 
             <nav class="nav" id="nav" aria-hidden="true">
-                <div class="profile">
+                <div class="profile" aria-hidden="true">
                     <div class="profile_logo">
-                        <h3 id="not-available" style="margin:0;font-size:14px;">N/A</h3>
+                        <span id="not-available" style="margin:0;font-size:13px;">N/A</span>
                     </div>
                 </div>
-                {%if user.is_authenticated%}
-                <li><a class="nav-item" href="{{ url_for('views.home') }}">Home</a></li>
-                <li><a href="{{ url_for('views.about') }}">About</a></li>
-                <li><a class="back" id="logout">Logout</a></li>
-                <li><button class="back" id="recent" type="button" aria-expanded="false" aria-controls="history-panel">Recent</button></li>
+                {% if user.is_authenticated %}
+                <a class="nav-item" href="{{ url_for('views.home') }}">Home</a>
+                <a href="{{ url_for('views.dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('views.about') }}">About</a>
+                <button class="back" id="recent" type="button" aria-expanded="false" aria-controls="history-panel">Recent</button>
                 <div id="history-panel" class="history-panel" aria-hidden="true">
                     <div class="history-latest">
                         <span class="history-latest-label">Latest total</span>
@@ -265,143 +38,34 @@
                     </div>
                     <table id="history">
                         <tbody id="history-body">
-                            <tr id="empty"><td><small style="color: white;">No recent emissions</small></td></tr>
+                            <tr id="empty"><td><small style="color:#c8e0de;">No recent emissions</small></td></tr>
                         </tbody>
                     </table>
                 </div>
-                {%else%}
-                <li><a href="{{ url_for('auth.signup') }}">Sign up</a></li>
-                <li><a href="{{ url_for('auth.login') }}">Login</a></li>
-                {%endif%}
+                <button class="back" id="logout" type="button">Logout</button>
+                {% else %}
+                <a href="{{ url_for('auth.signup') }}">Sign up</a>
+                <a href="{{ url_for('auth.login') }}">Login</a>
+                {% endif %}
             </nav>
         </div>
-    </div>
+    </header>
 
-    {% block script %}{% endblock %}
-    <div class="page-content">
+    <main class="page-content">
         {% block content %}{% endblock %}
-    </div>
+    </main>
 
-    <script type="text/javascript" charset="utf-8">
-
-        (function () {
-            const menu   = document.getElementById("menu");
-            const recent = document.getElementById("recent");
-            const historyPanel = document.getElementById("history-panel");
-            const historyBody  = document.getElementById("history-body");
-            const historyLatest = document.getElementById("history-latest-value");
-            const nav    = document.getElementById("nav");
-            const navBar = document.getElementById("nav-bar");
-            const links  = nav.querySelectorAll("a");
-            let historyLoaded = false;
-
-            function openMenu() {
-                navBar.classList.add("open");
-                nav.setAttribute("aria-hidden", "false");
-                menu.setAttribute("aria-expanded", "true");
-                menu.innerHTML = "&times;";
-            }
-
-            function closeMenu() {
-                navBar.classList.remove("open");
-                nav.setAttribute("aria-hidden", "true");
-                menu.setAttribute("aria-expanded", "false");
-                menu.innerHTML = "&#9776;";
-            }
-
-            function toggleMenu() {
-                navBar.classList.contains("open") ? closeMenu() : openMenu();
-            }
-
-            menu.addEventListener("click", toggleMenu);
-            logout.addEventListener("click",()=>{
-                fetch("/auth/logout", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": "{{ csrf_token() }}"
-                    }
-                }).then(response => {
-                    if (response.ok) {
-                        window.location.href = "{{ url_for('auth.login') }}";
-                    } else {
-                        console.error("Logout failed");
-                    }
-                }).catch(error => {
-                    console.error("Error during logout:", error);
-                });
-            }
-
-             );
-
-            document.addEventListener("keydown", (e) => {
-                if (e.key === "Escape" && navBar.classList.contains("open")) {
-                    closeMenu();
-                }
-            });
-
-            if (recent && historyPanel) {
-                recent.addEventListener("click", async () => {
-                    const isOpen = historyPanel.classList.contains("open");
-                    if (isOpen) {
-                        historyPanel.classList.remove("open");
-                        historyPanel.setAttribute("aria-hidden", "true");
-                        recent.setAttribute("aria-expanded", "false");
-                        return;
-                    }
-
-                    historyPanel.classList.add("open");
-                    historyPanel.setAttribute("aria-hidden", "false");
-                    recent.setAttribute("aria-expanded", "true");
-
-                    if (historyLoaded) return;
-
-                    try {
-                        const response = await fetch("/history");
-                        if (!response.ok) throw new Error("Failed to load history");
-                        const data = await response.json();
-                        const entries = Array.isArray(data.history) ? data.history : [];
-
-                        if (entries.length === 0) {
-                            historyLatest.textContent = "—";
-                            historyBody.innerHTML = '<tr id="empty"><td><small style="color: white;">No recent emissions</small></td></tr>';
-                            historyLoaded = true;
-                            return;
-                        }
-
-                        const latestTotalKg = (entries[0].search && entries[0].search.total_kg_co2e) || 0;
-                        historyLatest.textContent = (latestTotalKg / 1000).toFixed(2) + " t CO2e";
-
-                        historyBody.innerHTML = "";
-                        entries.slice(0, 5).forEach((entry) => {
-                            const totalKg = (entry.search && entry.search.total_kg_co2e) || 0;
-                            const date = entry.time ? new Date(entry.time).toLocaleDateString() : "N/A";
-                            const row = document.createElement("tr");
-                            row.innerHTML = `<td>${date}</td><td>${(totalKg / 1000).toFixed(2)} t</td>`;
-                            row.style.cursor = "pointer";
-                            row.addEventListener("click", () => {
-                                window.location.href = "{{ url_for('views.dashboard') }}#history-view";
-                            });
-                            historyBody.appendChild(row);
-                        });
-
-                        historyLoaded = true;
-                    } catch (error) {
-                        console.error("Error loading recent emissions:", error);
-                        historyBody.innerHTML = '<tr><td><small style="color: white;">Could not load recent emissions.</small></td></tr>';
-                    }
-                });
-            }
-
-            const currentPath = window.location.pathname;
-            links.forEach((link) => {
-                if (link.getAttribute("href") === currentPath) {
-                    link.classList.add("active");
-                }
-                link.addEventListener("click", closeMenu);
-            });
-
-        })();
+    <script>
+        window.CSRF_TOKEN = "{{ csrf_token() }}";
+        window.APP_ROUTES = {
+            loginUrl: "{{ url_for('auth.login') }}",
+            logoutUrl: "/auth/logout",
+            historyUrl: "/history",
+            dashboardUrl: "{{ url_for('views.dashboard') }}",
+            homeUrl: "{{ url_for('views.home') }}"
+        };
     </script>
+    <script src="{{ url_for('static', filename='base.js') }}"></script>
+    {% block script %}{% endblock %}
 </body>
 </html>
