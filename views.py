@@ -8,27 +8,21 @@ from sqlalchemy.exc import SQLAlchemyError
 from init import db
 from models import History
 from calculator import (
-    Transport,
-    EnhancedFuel,
-    Buildings,
-    Trees,
-    Adults,
-    Livestock,
-    Pets,
-    CarbonFootprint,
+    calculate_from_inputs,
+    calculate_single,
+    list_factors,
     InvalidUnitsError,
 )
 
 views = Blueprint("views", __name__)
 
 
-def _to_number(value, default=0):
-    try:
-        if value is None or value == "":
-            return default
-        return float(value)
-    except (TypeError, ValueError):
-        return default
+def _payload_from_request():
+    """Prefer JSON body; fall back to form fields."""
+    if request.is_json:
+        data = request.get_json(silent=True)
+        return data if isinstance(data, dict) else {}
+    return request.form.to_dict() if request.form else {}
 
 
 @views.route("/healthz")
@@ -53,61 +47,77 @@ def about():
     return render_template("about.html", user=current_user)
 
 
+# ---------------------------------------------------------------------------
+# Real-time calculation APIs (no persistence)
+# ---------------------------------------------------------------------------
+
+@views.route("/api/factors", methods=["GET"])
+def api_factors():
+    """Return emission factor tables for UI tooltips / docs."""
+    return jsonify(list_factors()), 200
+
+
+@views.route("/api/calculate", methods=["POST"])
+def api_calculate():
+    """
+    Real-time full footprint calculation.
+
+    Body: JSON or form fields (same shape as /submit).
+    Does NOT require login and does NOT write to the database.
+    """
+    payload = _payload_from_request()
+    try:
+        result = calculate_from_inputs(payload)
+    except InvalidUnitsError as e:
+        return jsonify({"ok": False, "message": str(e)}), 400
+    except Exception as e:
+        current_app.logger.exception("calculate failed")
+        return jsonify({"ok": False, "message": "Calculation failed."}), 500
+
+    return jsonify({"ok": True, **result}), 200
+
+
+@views.route("/api/calculate/single", methods=["POST"])
+def api_calculate_single():
+    """
+    Real-time single-source calculation.
+
+    JSON body example:
+      { "source": "transport", "units": 5, "transport_type": "car" }
+      { "source": "fuel", "units": 100, "fuel_type": "electricity" }
+      { "source": "trees", "units": 10 }
+    """
+    payload = _payload_from_request()
+    source = payload.get("source") or payload.get("type") or ""
+    units = payload.get("units", payload.get("value", 0))
+    try:
+        result = calculate_single(
+            source,
+            units,
+            transport_type=payload.get("transport_type") or payload.get("transport") or "car",
+            fuel_type=payload.get("fuel_type") or payload.get("fuel") or "gas",
+        )
+    except InvalidUnitsError as e:
+        return jsonify({"ok": False, "message": str(e)}), 400
+    except Exception:
+        current_app.logger.exception("calculate_single failed")
+        return jsonify({"ok": False, "message": "Calculation failed."}), 500
+
+    return jsonify({"ok": True, **result}), 200
+
+
+# ---------------------------------------------------------------------------
+# Persist assessment (login required)
+# ---------------------------------------------------------------------------
+
 @views.route("/submit", methods=["POST"])
 @login_required
 def submit():
-    form = request.form
-
-    transport_type = form.get("transport") or "other"
-    frequency_raw = form.get("frequency")
-    frequency = (
-        _to_number(form.get("frequency_custom"), default=1)
-        if frequency_raw == "multiple"
-        else _to_number(frequency_raw, default=1)
-    )
-
-    fuel_type = form.get("fuel") or "electricity"
-    energy_expense = _to_number(form.get("energy_expense"), default=0)
-
-    house_no = _to_number(form.get("house_no"), default=0)
-    trees = _to_number(form.get("trees"), default=0)
-    adults = _to_number(form.get("adults"), default=0)
-    livestock = _to_number(form.get("livestock"), default=0)
-    pets = _to_number(form.get("pets"), default=0)
-
-    calc = CarbonFootprint()
+    payload = _payload_from_request()
     try:
-        calc.add(Transport(frequency, transport_type=transport_type))
-        if energy_expense > 0:
-            calc.add(EnhancedFuel(energy_expense, fuel_type=fuel_type))
-        if house_no > 0:
-            calc.add(Buildings(house_no))
-        if trees > 0:
-            calc.add(Trees(trees))
-        if adults > 0:
-            calc.add(Adults(adults))
-        if livestock > 0:
-            calc.add(Livestock(livestock))
-        if pets > 0:
-            calc.add(Pets(pets))
+        result = calculate_from_inputs(payload)
     except InvalidUnitsError as e:
         return jsonify({"message": str(e)}), 400
-
-    result = {
-        "total_kg_co2e": calc.total(),
-        "breakdown": calc.breakdown(),
-        "inputs": {
-            "transport": transport_type,
-            "frequency": frequency,
-            "fuel": fuel_type,
-            "energy_expense": energy_expense,
-            "house_no": house_no,
-            "trees": trees,
-            "adults": adults,
-            "livestock": livestock,
-            "pets": pets,
-        },
-    }
 
     entry = History(user_id=current_user.id)
     entry.search = result
@@ -130,7 +140,12 @@ def dashboard():
         .order_by(History.time.desc())
         .first()
     )
-    return render_template("dashboard.html", user=current_user, latest_data=latest, now=datetime.utcnow())
+    return render_template(
+        "dashboard.html",
+        user=current_user,
+        latest_data=latest,
+        now=datetime.utcnow(),
+    )
 
 
 @views.route("/history")
