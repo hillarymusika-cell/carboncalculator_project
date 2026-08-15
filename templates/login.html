@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Login{% endblock %}
+{% block title %}Login · Cosmic Carbon Calculator{% endblock %}
 {% block style %}
 <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -11,18 +11,18 @@
     <div class="box">
       <div class="box-login" id="login">
         <div class="login-header">
-          <h2>Cosmic Systems</h2>
-          <small>Welcome</small>
+          <h2>Cosmic Carbon</h2>
+          <small>Sign in to track your footprint</small>
         </div>
 
         <div class="input-group">
           <div class="input-field">
-            <input type="email" name="login-email" id="login-email" class="input-box" placeholder=" " required />
+            <input type="email" name="login-email" id="login-email" class="input-box" placeholder=" " required autocomplete="email" />
             <label for="login-email">Email address</label>
           </div>
 
           <div class="input-field">
-            <input type="password" name="login-password" id="login-password" class="password-box" placeholder=" " required />
+            <input type="password" name="login-password" id="login-password" class="password-box" placeholder=" " required autocomplete="current-password" />
             <label for="login-password">Password</label>
             <div class="eye-area">
               <button type="button" class="eye-area-box" id="toggle-password" aria-label="Show password">
@@ -44,12 +44,17 @@
             <a href="{{ url_for('auth.signup') }}" id="input-signup" class="input-submit as-link">Don't have an account? Sign up</a>
           </div>
 
+          <div class="divider"><span>or</span></div>
+
           <div class="input-field">
-            <button type="button" id="google-sign" class="input-submit google">Continue with Google</button>
+            <button type="button" id="google-sign" class="input-submit google">
+              <i class="fa-brands fa-google" aria-hidden="true"></i>
+              Continue with Google
+            </button>
           </div>
 
           <div class="forgot" id="forgot">
-            <a href="#">Forgot Password</a>
+            <a href="#">Forgot Password?</a>
           </div>
         </div>
       </div>
